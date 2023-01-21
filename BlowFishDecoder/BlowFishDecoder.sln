@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlowFishDecoder", "BlowFishDecoder\BlowFishDecoder.csproj", "{7FC6C977-DFF6-4A24-947B-59E19FFD7F9C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7FC6C977-DFF6-4A24-947B-59E19FFD7F9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC6C977-DFF6-4A24-947B-59E19FFD7F9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC6C977-DFF6-4A24-947B-59E19FFD7F9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FC6C977-DFF6-4A24-947B-59E19FFD7F9C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D2E89AB-0339-484D-B785-0FE5B1E0B8AA}
+	EndGlobalSection
+EndGlobal

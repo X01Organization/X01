@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BlowFishDecoder": {
+      "commandName": "Project",
+      "commandLineArgs": "-k c:\\ff d:\\da -d aaa -l 33"
+    }
+  }
+}

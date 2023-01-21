@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TrimDistinct": {
+      "commandName": "Project",
+      "commandLineArgs": "-i c:/temp/test/d.txt -o"
+    }
+  }
+}
