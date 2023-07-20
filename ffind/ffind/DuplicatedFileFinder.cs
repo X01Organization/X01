@@ -2,6 +2,9 @@
 {
     public class DuplicatedFileFinder
     {
+        private readonly string[] _specialDirectories =
+            new[] {"lost+found", "$RECYCLE.BIN", "System Volume Information",};
+
         private readonly string[] _searchingDirectories;
         private readonly string[] _searchingExtensions;
         private readonly string _duplicatedFileDirectory;
@@ -28,40 +31,70 @@
             Console.WriteLine(string.Join(Environment.NewLine, _searchingExtensions.Select(x => "\t" + x)));
         }
 
+        private IEnumerable<DirectoryInfo> TryEnumerateDirectoriesInTopDirectory(DirectoryInfo di)
+        {
+            try
+            {
+                return di.EnumerateDirectories("*", SearchOption.TopDirectoryOnly);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error by TryEnumerateDirectoriesInTopDirectory({di.FullName}):");
+                Console.WriteLine(ex.ToString());
+                return Enumerable.Empty<DirectoryInfo>();
+            }
+        }
+
+        private IEnumerable<FileInfo> TryEnumerateFilesInTopDirectory(DirectoryInfo di)
+        {
+            try
+            {
+                return di.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
+                         .Where(x => x.Length > -1);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error by TryEnumerateFilesInTopDirectory({di.FullName}):");
+                Console.WriteLine(ex.ToString());
+                return Enumerable.Empty<FileInfo>();
+            }
+        }
+
+        private IEnumerable<FileInfo> TryEnumerateFilesInAllDirectories(DirectoryInfo di)
+        {
+            if (di.Exists)
+            {
+                if (_specialDirectories.Contains(di.Name))
+                {
+                    Console.WriteLine($"Skip special directory \"{di.FullName}\"");
+                }
+                else
+                {
+                    foreach (var x in TryEnumerateFilesInTopDirectory(di))
+                    {
+                        yield return x;
+                    }
+
+                    foreach (var x in TryEnumerateDirectoriesInTopDirectory(di))
+                    {
+                        foreach (var y in TryEnumerateFilesInAllDirectories(x))
+                        {
+                            yield return y;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"not found the directory \"{di.FullName}\"");
+            }
+        }
+
         public void DoJob()
         {
             var allFileInfos = _searchingDirectories.Select(x => new DirectoryInfo(x))
-                                                    .Where(x => x.Exists)
-                                                    .SelectMany(x
-                                                         =>
-                                                     {
-                                                         try
-                                                         {
-                                                             var files = x.EnumerateFiles("*",
-                                                                 SearchOption.AllDirectories);
-                                                             return files;
-                                                         }
-                                                         catch (Exception ex)
-                                                         {
-                                                             Console.WriteLine("Error by EnumerateFiles:");
-                                                             Console.WriteLine(ex.ToString());
-                                                             return Enumerable.Empty<FileInfo>();
-                                                         }
-                                                     })
-                //.Where(x =>
-                // {
-                //     try
-                //     {
-                //         return x.Length > -1;
-                //     }
-                //     catch (Exception ex)
-                //     {
-                //         Console.WriteLine("Error by get file length:");
-                //         Console.WriteLine(ex.ToString());
-                //         return false;
-                //     }
-                // })
-                ;
+                                                    .SelectMany(TryEnumerateFilesInAllDirectories);
+
             if (0 < _searchingExtensions.Length)
             {
                 allFileInfos = allFileInfos.Where(x => _searchingExtensions.Contains(x.Extension.ToLower()));
