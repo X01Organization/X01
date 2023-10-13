@@ -50,7 +50,8 @@
             try
             {
                 return di.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
-                         .Where(x => x.Length > -1);
+                         .Where(x => x.Length > -1)
+                         .ToArray();
             }
             catch (Exception ex)
             {
@@ -102,7 +103,16 @@
 
             foreach (var fileInfosWithSameSize in allFileInfos.GroupBy(x => x.Length).OrderBy(x => x.Key))
             {
-                MoveDuplicatedFiles(FindDuplicatedFiles(fileInfosWithSameSize));
+                try
+                {
+                    MoveDuplicatedFiles(FindDuplicatedFiles(fileInfosWithSameSize));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("error by moving and finding duplicated files for size: " +
+                                      fileInfosWithSameSize.Key +
+                                      "\n" + ex);
+                }
             }
         }
 

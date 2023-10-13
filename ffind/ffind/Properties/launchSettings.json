@@ -2,7 +2,7 @@
   "profiles": {
     "ffind": {
       "commandName": "Project",
-      "commandLineArgs": "-i C:\\Temp\\Test\\dia;C:\\Temp\\Test\\dia2 -o C:\\Temp\\Test\\test -e jpg;png"
+      "commandLineArgs": "-i C:\\Temp\\ -o C:\\Temp\\"
     }
   }
 }
