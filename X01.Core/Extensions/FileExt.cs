@@ -1,8 +1,8 @@
-namespace X01
+﻿namespace X01
 {
     public static class FileExt
     {
-        public void GetNoneExistanceFileName()
+        public static void GetNoneExistanceFileName()
         {
         }
     }

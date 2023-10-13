@@ -1,46 +1,118 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
-namespace X01
+namespace X01.Core.Relays;
+
+public class RelayStream : Stream
 {
-    public class RelayStream : Stream
+    //private readonly ILogger _logger;
+    private readonly Stream _stream;
+
+    public override bool CanRead
     {
-        readonly Cancelable<Stream> _cancelableStream;
-        Stream stream => _cancelableStream;
-        public override bool CanRead => stream.CanRead;
-        public override bool CanSeek => stream.CanSeek;
-        public override bool CanWrite => stream.CanWrite;
-        public override long Length => stream.Length;
-        public override long Position
+        get
         {
-            get => stream.Position;
-            set => stream.Position = value;
+            var v = _stream.CanRead;
+            LogInformation(v);
+            return v;
         }
-        public RelayStream(Cancelable<Stream> cancelableStream)
+    }
+
+    public override bool CanSeek
+    {
+        get
         {
-            _cancelableStream = cancelableStream;
+            var v = _stream.CanSeek;
+            LogInformation(v);
+            return v;
         }
-        public RelayStream(Stream stream) : this(new Cancelable<Stream>(stream, null))
+    }
+
+    public override bool CanWrite
+    {
+        get
         {
+            var v = _stream.CanWrite;
+            LogInformation(v);
+            return v;
         }
-        public override void Flush()
+    }
+
+    public override long Length
+    {
+        get
         {
-            stream.Flush();
+            var v = _stream.Length;
+            LogInformation(v);
+            return v;
         }
-        public override long Seek(long offset, SeekOrigin origin)
+    }
+
+    public override long Position
+    {
+        get
         {
-            return (stream.Seek(offset, origin));
+            var v = _stream.Position;
+            LogInformation(v, "GetPosition");
+            return v;
         }
-        public override void SetLength(long value)
+
+        set
         {
-            stream.SetLength(value);
+            var v = value;
+            LogInformation(v, "SetPosition");
+            _stream.Position = v;
         }
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            return (stream.Read(buffer, offset, count));
-        }
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            stream.Write(buffer, offset, count);
-        }
+    }
+
+    public override void Flush()
+    {
+        LogInformation(_stream.Position);
+        _stream.Flush();
+    }
+
+    public RelayStream(Stream stream)
+    {
+        _stream = stream;
+    }
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        int len = _stream.Read(buffer, offset, count);
+        LogInformation($"{offset}<>{count}<>{len}");
+        return len;
+    }
+
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        long position = _stream.Seek(offset, origin);
+        LogInformation($"{offset}<>{origin}<>{position}");
+        return position;
+    }
+
+    public override void SetLength(long value)
+    {
+        LogInformation($"{value}");
+        _stream.SetLength(value);
+    }
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        LogInformation($"{offset}<>{count}");
+        _stream.Write(buffer, offset, count);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        LogInformation(_stream.Position);
+        base.Dispose(disposing);
+    }
+
+    private void LogInformation<TValue>(TValue value, [CallerMemberName] string callerMemberName = "")
+    {
+        //_logger.LogInformation($"{_stream.GetHashCode()}  {callerMemberName}-->{value}");
     }
 }
