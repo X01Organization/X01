@@ -1,4 +1,6 @@
-
+﻿
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace X01
@@ -30,11 +32,11 @@ namespace X01
 
     public static class CancelableSourceExt
     {
-        public static IEnumerable<TItem> MonitorCancellation(this CancelableSource cs, IEnumerable<TItem> enumerable)
+        public static IEnumerable<TItem> MonitorCancellation<TItem>(this CancelableSource<TItem> cs, IEnumerable<TItem> enumerable)
         {
-            return enumerable.select(x =>
+            return enumerable.Select(x =>
             {
-                cs.throwifcancellationrequested
+                //cs.throwifcancellationrequested
             return x;
             });
         }
