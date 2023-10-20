@@ -6,14 +6,14 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using System.IO;
 
-namespace Journaway.Core.Xiang;
+namespace X01.Core.Extensions;
 
-public class TypeExtensions
+public static class TypeExtensions
 {
     /// <summary>
     /// https://www.tutorialsteacher.com/articles/difference-between-string-and-string-in-csharp
     /// </summary>
-    private string GetTypeAliases(Type type)
+    private static string GetTypeAliases(Type type)
     {
         var aliases = new Dictionary<Type, string>()
         {
@@ -36,7 +36,7 @@ public class TypeExtensions
         return aliases.TryGetValue(type, out var alias) ? alias : null;
     }
 
-    private string GetTypeNameForVariable(Type type)
+    private static string GetTypeNameForVariable(Type type)
     {
         if (type.IsArray)
         {
@@ -59,7 +59,7 @@ public class TypeExtensions
         return GetTypeAliases(type) ?? type.Name;
     }
 
-    private void test111()
+    private static void test111()
     {
         var tripType = typeof(TypeExtensions);
         var contentTypeNamespace = tripType.Namespace;
@@ -77,7 +77,7 @@ public class TypeExtensions
                                                                 != x.GetCustomAttribute<JsonIgnoreAttribute>()
                                                                    ?.Condition)
                                                        .ToArray();
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("using System.Collections.Generic;");
             sb.AppendLine();
             sb.AppendLine();
@@ -119,7 +119,7 @@ public class TypeExtensions
         }
     }
 
-    private object getdefaultvalue(Type t)
+    private static object getdefaultvalue(Type t)
     {
         if (t.IsValueType)
         {
@@ -141,7 +141,7 @@ public class TypeExtensions
         return v;
     }
 
-    private void SetProperties(object obj)
+    private static void SetProperties(object obj)
     {
         var type = obj.GetType();
         //if (type.IsListType())

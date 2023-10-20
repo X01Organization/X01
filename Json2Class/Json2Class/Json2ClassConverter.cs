@@ -24,7 +24,7 @@ namespace Json2Class
 
 #region TEST
 
-#if false
+#if true
             await foreach (var json in GetJsonsAsync(false, token))
             {
             }

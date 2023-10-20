@@ -9,9 +9,6 @@ namespace ContentfulModelGenerator
 {
     public class ModelGenerator
     {
-        private const string URL = "https://api.contentful.com/spaces/iipo05hi434x/environments/test/content_types";
-        private const string AUTH = "CFPAT-JpwZIOyBEDbga0Qp8rY6p5W-lKccf6DS04Caj-g452I";
-
         public async Task GenerateAsync(CancellationToken token = default)
         {
             using var httpClient = new HttpClient();
