@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Json2Class": {
-      "commandName": "Project",
-      "commandLineArgs": "-i C:\\Users\\zxiang\\Desktop\\schema1.json -o C:\\Users\\zxiang\\Desktop\\Dto -n  ContentfulImage -s Nirvana.Dto.Contentful"
-    }
-  }
-}

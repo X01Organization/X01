@@ -24,13 +24,14 @@ namespace Json2Class
 
 #region TEST
 
-#if true
+#if false
             await foreach (var json in GetJsonsAsync(false, token))
             {
             }
 
 #endif
 
+            //return;
 #endregion
 
             Dictionary<string, ClassInfo> classInfoDictionary = new Dictionary<string, ClassInfo>();
@@ -88,8 +89,8 @@ namespace Json2Class
                 }
                 else
                 {
-                    var response =
-                        await client.GetAsync($"https://localhost:1991/valhalla/getTrip?tripId={tripId}&culture=de-DE");
+                    //var response = await client.GetAsync($"https://localhost:1991/valhalla/gettrip?tripId={tripId}");
+                    var response = await client.GetAsync($"https://www.journaway.com/aggregator/valhalla/gettrip?tripId={tripId}");
                     //var response = await client.GetAsync($"https://www.journaway.com/de/api/schema?trip={tripId}");
                     //var response = await client.GetAsync($"https://www.journaway.com/de/api/tripdayinfo?trip={tripId}");
                     var json = await response.Content.ReadAsStringAsync();
