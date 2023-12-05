@@ -4,7 +4,7 @@ namespace X01.Core.Checkers;
 
 public class ProperitiesChecker
 {
-    public void Check(object obj)
+    public static void Check(object obj)
     {
         var objType = obj.GetType();
         if (objType.IsValueType)

@@ -341,3 +341,7 @@ healthchecksdb
 /NuGetPackages/*
 /Logs
 */dotnet-tools.json
+
+*.user
+.vs
+
