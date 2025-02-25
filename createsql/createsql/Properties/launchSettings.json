@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "createsql": {
+      "commandName": "Project"
+    }
+  }
+}

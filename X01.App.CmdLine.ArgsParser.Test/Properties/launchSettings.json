@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "X01.App.CmdLine.ArgsParser.Test": {
+      "commandName": "Project",
+      "commandLineArgs": " --help --version --input=1 --input=2 --output=/c/test/5667 --no-trim -x --env dev -o no-compile -t \"-333\" -123=\" \" -pw=\"as--df ==q34\""
+    }
+  }
+}

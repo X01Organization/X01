@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "X01.App.RemoveNullableEnable": {
+      "commandName": "Project",
+      "commandLineArgs": "-i=C:\\workroot\\project\\dotnetcore-tools-dev\\Backend\\Backend.Services"
+    }
+  }
+}

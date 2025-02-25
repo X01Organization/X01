@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "X01.App.LogMerger": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\workroot\\project\\dotnetcore-tools\\DotnetRestSvc\\bin\\Debug\\net6.0\\log\\test.txt C:\\workroot\\project\\dotnetcore-tools\\DotnetRestSvc\\bin\\Debug\\net6.0\\log\\error.log\r\nC:\\workroot\\project\\dotnetcore-tools\\DotnetRestSvc\\bin\\Debug\\net6.0\\log\\error.2023-11-20.log\r\nC:\\workroot\\project\\dotnetcore-tools\\DotnetRestSvc\\bin\\Debug\\net6.0\\log\\error.2023-11-21.log\r\nC:\\workroot\\project\\dotnetcore-tools\\DotnetRestSvc\\bin\\Debug\\net6.0\\log\\error.2023-11-22.log\r\nC:\\workroot\\project\\dotnetcore-tools\\DotnetRestSvc\\bin\\Debug\\net6.0\\log\\error.2023-11-23.log\r\nC:\\workroot\\project\\dotnetcore-tools\\DotnetRestSvc\\bin\\Debug\\net6.0\\log\\error.2023-11-27.log"
+    }
+  }
+}
