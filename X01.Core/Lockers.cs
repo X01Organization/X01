@@ -40,8 +40,4 @@ namespace X01
                     }
                     return;
                 }
-                Thread.Sleep(intervalInMilliseconds);
-            }
-        }
-    }
-}
+                Thread.Sleep(intervalInMillisec

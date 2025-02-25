@@ -16,7 +16,4 @@ namespace X01
             {
                 return (false);
             }
-            return (true);
-        }
-    }
-}
+          

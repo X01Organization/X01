@@ -20,8 +20,4 @@
             {
                 cts?.Dispose();
             }
-            cts = new CancellationTokenSource();
-            return (cts.Token);
-        }
-    }
-}
+            cts = new CancellationTokenSourc
