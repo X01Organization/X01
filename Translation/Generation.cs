@@ -5,19 +5,32 @@ public class Generation
 {
     public void Generate()
     {
-        var lines = File.ReadAllLines("C:\\workroot\\1.txt");
-        var test = lines.Where(x=> !string.IsNullOrWhiteSpace(x)).Select(x=> x.Split('|'))
-            .Select(x=>new Info(){ english = x[0].Trim(), german=x[1].Trim(), header = "transport",})
+Generate1();
+Generate2();
+    }
+ public void Generate3()
+    {
+        var lines = File.ReadAllLines("C:\\workroot\\3.txt");
+        var test = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('|'))
+            .Select(x => new Info() { english = x[0].Trim(), german = x[1].Trim(), header = "transport", })
             .ToList();
+        writeFile("c:/workroot/translation3.json", test, false);
+        int a = 0;
+    }
 
-writeFile(test);
-        int a =0;
+    public void Generate2()
+    {
+        var lines = File.ReadAllLines("C:\\workroot\\2.txt");
+        var test = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('|'))
+            .Select(x => new Info() { english = x[0].Trim(), german = x[1].Trim(), header = "transport", })
+            .ToList();
+        writeFile("c:/workroot/translation2.json", test, false);
     }
 
     public void Generate1()
     {
         var lines = File.ReadAllLines("C:\\workroot\\1.txt");
-        var headers = new[] { "hotel", "room", "parking", };
+        var headers = new[] { "accommodation.hotel", "accommodation.room", "accommodation.parking", };
 
         List<Info> all = new List<Info>();
         foreach (var x in lines.Skip(2))
@@ -29,10 +42,10 @@ writeFile(test);
             all.AddRange(generate(headers, x));
         }
 
-        writeFile(all);
+        writeFile("c:/workroot/translation1.json", all, true);
     }
 
-    private void writeFile(List<Info> all)
+    private void writeFile(string file,List<Info> all, bool germanKey)
     {
         StringBuilder sb = new StringBuilder();
         foreach (var x in all.DistinctBy(x => new
@@ -42,9 +55,10 @@ writeFile(test);
             x.english,
             x.dutch,
         })
-            .Where(x => !(x.german == x.english && x.german == x.dutch)).Select(x =>
+            //.Where(x => !(x.german == x.english && x.german == x.dutch))
+            .Select(x =>
         {
-            x.header = $"contentful.amenity.{x.header}.{x.english}";
+            x.header = $"contentful.{x.header}.{(germanKey ? x.german : x.english)}";
             return x;
         })
             .OrderBy(x => x.header).ThenBy(x=> x.order).DistinctBy(x=> x.header))
@@ -73,7 +87,7 @@ writeFile(test);
             sb.AppendLine();
         }
 
-        File.WriteAllText("c:/workroot/test11.json", sb.ToString());
+        File.WriteAllText(file, sb.ToString());
     }
     private IEnumerable<Info> generate(string[] headers, string line)
     {

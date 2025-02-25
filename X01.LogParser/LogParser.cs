@@ -1,10 +1,8 @@
 ﻿
 using System.Text.RegularExpressions;
 using X01.Core.Extensions;
-using X01.LogParser;
 
-namespace X01.LogMerger;
-
+namespace X01.LogParser;
 
 public class LogParser
 {
@@ -26,8 +24,14 @@ Tag = tag,
                 Message = match.Groups["message"].Value.Trim()
             });
     }
+    #if false
     private DateTime? GetLogTime(string? logLine)
     {
+        if(string.IsNullOrWhiteSpace(logLine))
+        {
+            return null;
+        }
+
                 string pattern = @"(?<logTime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{4}) \[(?<threadId>\d+)\] (?<logLevel>\w+) \[(?<logType>\w+)\] \[(?<class>[\w.]+)\] - (?<logMessage>.*)";
 
                 Regex regex = new Regex(pattern);
@@ -46,14 +50,15 @@ Tag = tag,
         }
         return null;
     }
+    #endif
 }
 public class LogEntry
 {
-    public string Tag { get; set; }
-    public string Timestamp { get; set; }
-    public string ThreadId { get; set; }
-    public string LogType { get; set; }
-    public string LogLevel { get; set; }
-    public string ClassNamespace { get; set; }
-    public string Message { get; set; }
+    public string? Tag { get; set; }
+    public string? Timestamp { get; set; }
+    public string? ThreadId { get; set; }
+    public string? LogType { get; set; }
+    public string? LogLevel { get; set; }
+    public string? ClassNamespace { get; set; }
+    public string? Message { get; set; }
 }

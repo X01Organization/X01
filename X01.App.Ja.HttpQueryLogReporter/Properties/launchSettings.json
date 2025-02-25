@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "X01.App.Ja.HttpQueryLogReporter": {
+      "commandName": "Project",
+      "commandLineArgs": "-i C:\\workroot\\logs\\www_de -o C:\\workroot\\logs"
+    }
+  }
+}

@@ -9,9 +9,8 @@ public sealed class CmdLineArgsAttribute : Attribute
     public string? ShortName { get; set; }
     public string? LongName { get; set; }
     public string? HelpText { get; set; }
+    public bool Required { get; set; }
 }
-
-
 
 
 //TrimDistinct 1.0.0+9ee922019d6d3887ea2eb033d7a0bae356bd8918

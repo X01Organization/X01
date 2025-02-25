@@ -1,6 +1,6 @@
-﻿using CommandLine;
-using Json2Class;
+﻿using Json2Class;
+using Json2Classes;
+using X01.CmdLine;
 
-Parser.Default
-      .ParseArguments<Options>(args)
-      .WithParsed(o => { new Json2ClassConverter(o).DoJobAsync().GetAwaiter().GetResult(); });
+var option = new CmdLineArgsParser().Parse<Option>(args);
+   new Json2ClassConverter(option).DoJobAsync().GetAwaiter().GetResult(); 

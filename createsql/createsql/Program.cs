@@ -1,6 +1,15 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Text.Json;
 using createsql;
+
+try{
+var result = await new Class2().TestAsync();
+    int b = 0;
+}catch(Exception ex){ 
+    int a = 0;
+}
+
 
 var tabledict = new Dictionary<string, long>()
 {

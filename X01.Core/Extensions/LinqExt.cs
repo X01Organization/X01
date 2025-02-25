@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace X01
 {
     public static class LinqExt

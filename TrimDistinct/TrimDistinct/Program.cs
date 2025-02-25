@@ -5,8 +5,8 @@ Parser.Default
       .ParseArguments<Options>(args)
       .WithParsed(o =>
        {
-           File.WriteAllLines(o.Output,
-               File.ReadAllLines(o.Input)
+           File.WriteAllLines(o.Output!,
+               File.ReadAllLines(o.Input!)
                    .Select(line => line.Trim())
                    .Where(line => !string.IsNullOrEmpty(line))
                    .Distinct()

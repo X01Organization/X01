@@ -1,22 +1,68 @@
 ﻿using ContentfulModelGenerator.Dto;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace ContentfulModelGenerator
 {
     public class ModelGenerator
     {
+        private const string URL = "https://api.contentful.com/spaces/iipo05hi434x/environments/test/content_types";
+
         public async Task GenerateAsync(CancellationToken token = default)
         {
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AUTH);
             var response = await httpClient.GetAsync(URL);
-            //var test = await response.Content.ReadAsStringAsync();
+            var test = await response.Content.ReadAsStringAsync();
+
+            await File.WriteAllTextAsync("c:/workroot/contentfulModel.json", test, token);
+
+            var contentfulModel = JsonSerializer.Deserialize<JsonNode>(test)!;
+
+            WriteObjectType(contentfulModel);
+
             var cfModel = await response.Content.ReadFromJsonAsync<CfModel>();
             await GenerateAsync(cfModel, token);
+        }
+
+        private void WriteObjectType(JsonNode jsonNode)
+        {
+            Dictionary<string, List<string>> testssss = new Dictionary<string, List<string>>();
+            var items = jsonNode.AsObject()["items"];
+            foreach (var z in items!.AsArray())
+            {
+                var x = z!.AsObject();
+                var fileds = x["fields"]!.AsArray();
+                foreach (var y in fileds)
+                {
+                    var property = y!.AsObject();
+                    var type = property["type"];
+                    if (type!.GetValue<string>() == "Object")
+                    {
+                        var imagePropertyId = property["id"]!.GetValue<string>();
+                        var entryTypeId = x["sys"]!.AsObject()["id"]!.GetValue<string>();
+                        if(!  testssss.TryGetValue(entryTypeId, out var lst)){ 
+lst = new List<string>();
+testssss.Add( entryTypeId, lst );
+                        }
+
+                        lst.Add(imagePropertyId );
+                        Debug.WriteLine($"{entryTypeId}==>{imagePropertyId}");
+                    }
+                }
+            }
+
+            var test11j = string.Join('\n', testssss.Select(x=>x.Key + "\n\t" + string.Join("\n\t" ,x.Value.Select(y => y))).OrderBy(x=> x));
+            var test = string.Join('\n', testssss.SelectMany(x=> x.Value).Select(x=> $"    public Dictionary<string, ContentfulImage[] >? {char.ToUpper( x[0])}{x.Substring(1)}"+" { get; set; }"));
+            int a3 = 0;
+            if (a3 == 0)
+            {
+                return;
+            }
         }
 
         private async Task GenerateAsync(CfModel cfModel, CancellationToken token)
@@ -29,12 +75,17 @@ namespace ContentfulModelGenerator
 
             dir.Create();
 
+            var allLocalizedFields = new List<string>();
             var typeIdSb = new StringBuilder();
 
+            typeIdSb.AppendLine("using System.Collections.ObjectModel;");
+            typeIdSb.AppendLine();
             typeIdSb.AppendLine("namespace Nirvana.Dto.Contentful;");
             typeIdSb.AppendLine();
             typeIdSb.AppendLine($"public class ContentfulTypeIds");
             typeIdSb.AppendLine("{");
+            typeIdSb.AppendLine("    public const string ContentTypeId = \"contentTypeId\";");
+            typeIdSb.AppendLine();
 
 
             foreach (var x in cfModel.Items.OrderBy(x => x.Sys.Id))
@@ -43,13 +94,15 @@ namespace ContentfulModelGenerator
                 {
                     continue;
                 }
+                bool isdestination = new[] { "Continent", "Country", "Region", "City", "Highlight", }
+                .Contains(GetFieldName(x.Sys.Id));
 
                 var sb1 = new StringBuilder();
                 await GenerateModelAsync(sb1, x, token);
                 var content = sb1.ToString();
 
                 var sb = new StringBuilder();
-                if (content.Contains("Converter))]"))
+                if (content.Contains("Json") || isdestination)
                 {
                     sb.AppendLine("using System.Text.Json.Serialization;");
                     sb.AppendLine();
@@ -65,17 +118,50 @@ namespace ContentfulModelGenerator
                 sb.AppendLine($"    public const string ContentTypeId = ContentfulTypeIds.{GetFieldName(x.Sys.Id)};");
                 sb.AppendLine();
 
+                if (isdestination)
+                {
+                    sb.AppendLine("    [JsonIgnore]");
+                    sb.AppendLine("    public int? DestinationOrder { get; set; }");
+                    sb.AppendLine();
+                }
+
                 sb.Append(content);
+                if ("TextModule" == GetFieldName(x.Sys.Id))
+                {
+
+                    sb.AppendLine();
+                    sb.AppendLine(@"    public override string? ToString()
+    {
+        return Text;
+    }");
+                }
                 sb.AppendLine("}");
 
                 File.WriteAllText($"{dir.FullName}/Contentful" + GetFieldName(x.Sys.Id) + ".cs", sb.ToString().Trim());
 
                 typeIdSb.AppendLine($"    public const string {GetFieldName(x.Sys.Id)} = \"{x.Sys.Id}\";");
+
+                var localizedFields = x.Fields.Where(y => true == y.Localized)
+                    .Select(y => "$\"{" + GetFieldName(x.Sys.Id) + "}." + y.Id + "\"")
+                    .ToArray();
+                allLocalizedFields.AddRange(localizedFields);
             }
+
+            typeIdSb.AppendLine();
+            allLocalizedFields = allLocalizedFields.OrderBy(x => x).
+                Select(x => $"        {x},")
+                .ToList();
+            typeIdSb.AppendLine("    public static readonly ReadOnlyCollection<string> LocalizedFields = new List<string>");
+            typeIdSb.AppendLine("    {");
+            typeIdSb.AppendLine(string.Join(Environment.NewLine, allLocalizedFields));
+            typeIdSb.AppendLine("    }.AsReadOnly();");
 
             typeIdSb.AppendLine("}");
             File.WriteAllText($"{dir.FullName}/ContentfulTypeIds.cs", typeIdSb.ToString().Trim());
 
+            //allLocalizedFields =    allLocalizedFields.OrderBy(x=> x).ToList();
+            //var sb5 = new StringBuilder();
+            //File.WriteAllText($"{dir.FullName}/ContentfulLocalizedFields.cs", sb5.ToString().Trim());
             return;
 
             foreach (var x in cfModel.Items)
@@ -128,6 +214,7 @@ namespace ContentfulModelGenerator
 
         private async Task GenerateModelAsync(StringBuilder sb, CfModelItems cfModelItem, CancellationToken token)
         {
+            await Task.Delay(1);
             var allfields = cfModelItem.Fields.Where(x => true != x.Disabled).ToArray();
             int i = 0;
             foreach (var x in allfields.OrderBy(x =>
@@ -137,7 +224,7 @@ namespace ContentfulModelGenerator
                 var fieldNames = new[]
                 {
                     "InternalName", "title", "Description", "productLine", "headline",
-                }.SelectMany(x => new[] {x, "sub" + x,}).ToArray();
+                }.SelectMany(x => new[] { x, "sub" + x, }).ToArray();
 
                 if (GetOrder(ref order, fieldName, fieldNames))
                 {
@@ -201,7 +288,6 @@ namespace ContentfulModelGenerator
                     sb.AppendLine("    [JsonConverter(typeof(ContentfulRichTextConverter))]");
                 }
 
-
                 if (fieldTypeName == "ContentfulDestinations")
                 {
                     sb.AppendLine("    [JsonConverter(typeof(ContentfulDestinationsConverter))]");
@@ -210,6 +296,11 @@ namespace ContentfulModelGenerator
                 if (fieldTypeName == "ContentfulTeaser")
                 {
                     sb.AppendLine("    [JsonConverter(typeof(ContentfulRichTextTeaserConverter))]");
+                }
+
+                if (true == x.Required)
+                {
+                    sb.AppendLine("    [JsonRequired]");
                 }
 
                 sb.AppendLine($"    public {fieldTypeName}? {GetFieldName(x.Id)} "
@@ -267,6 +358,7 @@ namespace ContentfulModelGenerator
 
         private async Task GenerateAsync(StringBuilder sb, CfModelItems cfModelItem, CancellationToken token)
         {
+            await Task.Delay(1);
             foreach (var x in cfModelItem.Fields.Where(x => true != x.Disabled).OrderBy(x =>
             {
                 var fieldName = GetFieldName(x.Id);
@@ -274,7 +366,7 @@ namespace ContentfulModelGenerator
                 var fieldNames = new[]
                 {
                     "InternalName", "title", "Description", "productLine", "headline",
-                }.SelectMany(x => new[] {x, "sub" + x,}).ToArray();
+                }.SelectMany(x => new[] { x, "sub" + x, }).ToArray();
 
                 if (GetOrder(ref order, fieldName, fieldNames))
                 {
@@ -307,37 +399,37 @@ namespace ContentfulModelGenerator
             switch (fieldType)
             {
                 case "Boolean":
-                {
-                    return "bool";
-                }
+                    {
+                        return "bool";
+                    }
                 case "Integer":
-                {
-                    return "int";
-                }
+                    {
+                        return "int";
+                    }
                 case "Number":
-                {
-                    return "double";
-                }
+                    {
+                        return "double";
+                    }
                 case "Object":
-                {
-                    return "List<ContentfulImage>";
-                }
+                    {
+                        return "List<ContentfulImage>";
+                    }
                 case "Symbol":
-                {
-                    return "string";
-                }
+                    {
+                        return "string";
+                    }
                 case "Text":
-                {
-                    return "string";
-                }
+                    {
+                        return "string";
+                    }
                 case "RichText":
-                {
-                    return "ContentfulRichText";
-                }
+                    {
+                        return "ContentfulRichText";
+                    }
                 case "Link":
-                {
-                    return "Link";
-                }
+                    {
+                        return "Link";
+                    }
             }
 
             throw new Exception(fieldType);

@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Threading;
-
-namespace X01
+﻿namespace X01
 {
     public sealed class CtReplacer : ADisposable
     {
-        CancellationTokenSource cts;
+        CancellationTokenSource? cts;
 
         public CtReplacer()
         {

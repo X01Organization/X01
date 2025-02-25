@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace X01 {
-     public static class ObjectExt{
+﻿namespace X01
+{
+    public static class ObjectExt{
           public static bool IsRecycled(this object obj) {
             try {
                 obj?.GetType();

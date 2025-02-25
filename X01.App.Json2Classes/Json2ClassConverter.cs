@@ -1,20 +1,21 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Json2Classes;
 
 namespace Json2Class
 {
     public class Json2ClassConverter
     {
-        private readonly Options _options;
+        private readonly Option _option;
 
-        public Json2ClassConverter(Options options)
+        public Json2ClassConverter(Option options)
         {
-            _options = options;
+            _option = options;
         }
 
         public async Task DoJobAsync(CancellationToken token = default)
         {
-            var outputDirectoryInfo = new DirectoryInfo(_options.OutputDirectory);
+            var outputDirectoryInfo = new DirectoryInfo(_option.OutputDirectory);
             if (outputDirectoryInfo.Exists)
             {
                 outputDirectoryInfo.Delete(true);
@@ -46,7 +47,7 @@ namespace Json2Class
                     ms.Position = 0;
                     using var jsonDocument = await JsonDocument.ParseAsync(ms, cancellationToken: token);
 
-                    await ConvertAsync(classInfoDictionary, GetClassName(_options.ClassName), jsonDocument.RootElement,
+                    await ConvertAsync(classInfoDictionary, GetClassName(_option.ClassName), jsonDocument.RootElement,
                         token);
                 }
             }
@@ -67,7 +68,7 @@ namespace Json2Class
         {
             if (fromFile)
             {
-                yield return await File.ReadAllTextAsync(_options.InputFile, token);
+                yield return await File.ReadAllTextAsync(_option.InputJsonFile, token);
                 yield break;
             }
 
@@ -223,7 +224,7 @@ namespace Json2Class
             var classInfo = new ClassInfo()
             {
                 Name = className,
-                NameSpace = _options.Namespace,
+                NameSpace = _option.Namespace,
             };
             classInfo.Usings.Add("System.Text.Json.Serialization");
             return classInfo;
@@ -277,7 +278,7 @@ namespace Json2Class
                 throw new InvalidOperationException("Wrong property");
             }
 
-            var classFileName = Path.Combine(_options.OutputDirectory, classInfo.Name + ".cs");
+            var classFileName = Path.Combine(_option.OutputDirectory, classInfo.Name + ".cs");
             await using var fs = File.OpenWrite(classFileName);
             await using var sw = new StreamWriter(fs);
             foreach (var x in classInfo.Usings.Distinct().OrderBy(x => x))

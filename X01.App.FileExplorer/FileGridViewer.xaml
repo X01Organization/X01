@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="X01.App.FileExplorer.FileGridViewer"
+             Title="FileGridViewer">
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition ></ColumnDefinition>
+            <ColumnDefinition ></ColumnDefinition>
+        
+        </Grid.ColumnDefinitions>
+        <Label 
+        Grid.Row="0"
+        Grid.Column="0"
+            Text="Welcome to .NET MAUI2!"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+        <Label 
+        Grid.Row="0"
+        Grid.Column="1"
+            Text="Welcome to .NET MAUI1!"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

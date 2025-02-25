@@ -1,9 +1,4 @@
-﻿
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-
-namespace X01
+﻿namespace X01
 {
 
     public class CancelableSource<TObject>

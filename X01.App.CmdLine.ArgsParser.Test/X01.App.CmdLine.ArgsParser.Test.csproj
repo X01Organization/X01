@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Adyen" Version="14.0.0" />
+    <PackageReference Include="JetBrains.ReSharper.CommandLineTools" Version="2023.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\X01.CmdLine\X01.CmdLine.csproj" />
   </ItemGroup>
 

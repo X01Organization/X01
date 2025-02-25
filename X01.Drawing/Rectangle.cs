@@ -1,4 +1,4 @@
-namespace X01
+﻿namespace X01
 {
     public struct Rectangle
     {
@@ -12,9 +12,8 @@ namespace X01
             get;
             set;
         }
-        public Rectangles Union()
-        {
-
-        }
+        //public Rectangles Union()
+        //{
+        //}
     }
 }

@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System;
-using System.Linq;
+﻿using System.Reflection;
 using System.Text;
-using System.Reflection;
 using System.Text.Json.Serialization;
-using System.IO;
 
 namespace X01.Core.Extensions;
 
@@ -13,7 +9,7 @@ public static class TypeExtensions
     /// <summary>
     /// https://www.tutorialsteacher.com/articles/difference-between-string-and-string-in-csharp
     /// </summary>
-    private static string GetTypeAliases(Type type)
+    private static string? GetTypeAliases(Type type)
     {
         var aliases = new Dictionary<Type, string>()
         {
@@ -185,4 +181,9 @@ public static class TypeExtensions
             x.SetValue(obj, getdefaultvalue(x.PropertyType));
         }
     }
+
+
+    //public static object ConvertValue(this Type type, ) { 
+    //    Convert.ChangeType();
+    //}
 }

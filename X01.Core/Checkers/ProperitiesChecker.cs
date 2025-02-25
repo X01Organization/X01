@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace X01.Core.Checkers;
+﻿namespace X01.Core.Checkers;
 
 public class ProperitiesChecker
 {

@@ -1,10 +1,5 @@
 ﻿//https://docs.microsoft.com/en-us/dotnet/api/microsoft.toolkit.mvvm.input?view=win-comm-toolkit-dotnet-7.0
 
-
-
-using System;
-using System.Windows.Input;
-
 namespace X01
 {
     //public class RelayCommand : ICommand

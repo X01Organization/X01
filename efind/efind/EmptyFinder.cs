@@ -8,7 +8,7 @@
         private readonly string[] _inputDirectories;
         private readonly string _outputDirectory;
 
-        public DuplicatedFileFinder(Options options)
+        public EmptyFinder(Options options)
         {
             _inputDirectories = options.Inputs
                                            .Select(x => x.Trim())

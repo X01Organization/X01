@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace X01
+﻿namespace X01
 {
     //public class BindableSource : INotifyPropertyChanged
     //{
