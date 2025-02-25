@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ExcelDataReader;
 
-using (var stream = File.Open("C:\\workroot\\1.xls", FileMode.Open, FileAccess.Read))
+using (FileStream stream = File.Open("C:\\workroot\\1.xls", FileMode.Open, FileAccess.Read))
 {
     // Auto-detect format, supports:
     //  - Binary Excel files (2.0-2003 format; *.xls)
