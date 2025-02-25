@@ -36,7 +36,7 @@ public class LogMerger
         "System.IO.IOException: Unable to read data from the transport connection: Operation canceled.",
         "System.IO.IOException: Unable to read data from the transport connection: Connection reset by peer",
         "Npgsql.PostgresException (0x80004005): 57014: canceling statement due to user request",
-        "Npgsql.PostgresException (0x80004005): 53300: remaining connection slots are reserved for roles",
+        "Npgsql.PostgresException (0x80004005): 53300: remaining connection slots are reserved for",
         "Npgsql.PostgresException (0x80004005): 53300: sorry, too many clients already",
         "Npgsql.PostgresException (0x80004005): 23505: duplicate key value violates unique constraint",
         "Npgsql.NpgsqlException (0x80004005): Failed to connect to",
