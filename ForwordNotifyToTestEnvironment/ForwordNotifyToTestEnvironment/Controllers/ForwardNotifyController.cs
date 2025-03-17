@@ -40,15 +40,16 @@ namespace ForwordNotifyToTestEnvironment.Controllers
                     }
                 }
                 string url = "https://test.journaway.com/backend/api/payment/notify?auth=20Journaway19";
-                using HttpClient client = new HttpClient();
-                Dictionary<string, string> values = new Dictionary<string, string> {
+                using HttpClient client = new();
+                Dictionary<string, string> values = new()
+                {
                     { "data", data },
                     { "len", len.ToString() },
                 };
                 //neusta:9hX!X75fxh
                 byte[] byteArray = new UTF8Encoding().GetBytes("neusta:9hX!X75fxh");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-                FormUrlEncodedContent formData = new FormUrlEncodedContent(values);
+                FormUrlEncodedContent formData = new(values);
                 HttpResponseMessage response = await client.PostAsync(url, formData);
                 responseContent = response.Content.ReadAsStringAsync().Result;
                 response.EnsureSuccessStatusCode();

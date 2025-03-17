@@ -1,6 +1,4 @@
-﻿using CommandLine;
-
-namespace Json2Class
+﻿namespace Json2Class
 {
     public class Options
     {

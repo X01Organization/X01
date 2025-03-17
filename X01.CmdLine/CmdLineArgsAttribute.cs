@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using System;
-
-namespace X01.CmdLine;
+﻿namespace X01.CmdLine;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 public sealed class CmdLineArgsAttribute : Attribute

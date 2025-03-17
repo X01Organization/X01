@@ -55,7 +55,7 @@ Host synology
 
     private string GetName(string name)
     {
-        Dictionary<string, string> dict = new Dictionary<string, string>(){ 
+        Dictionary<string, string> dict = new(){ 
 {"TEST",              "test_svc"}             ,
 {"Product",           "product"}             ,
 {"Grafana",           "grafana"}                     ,

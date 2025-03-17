@@ -2,5 +2,5 @@
 using Json2Classes;
 using X01.CmdLine;
 
-var option = new CmdLineArgsParser().Parse<Option>(args);
+Option option = new CmdLineArgsParser().Parse<Option>(args);
    new Json2ClassConverter(option).DoJobAsync().GetAwaiter().GetResult(); 

@@ -83,7 +83,7 @@ namespace ForwardNotifyToTestEnvironment
             if (IsParsableMime(request.ContentType))
             {
                 request.Body.Seek(0, SeekOrigin.Begin);
-                using (StreamReader reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+                using (StreamReader reader = new(request.Body, Encoding.UTF8, true, 1024, true))
                 {
                     bodyAsText = await reader.ReadToEndAsync();
                 }

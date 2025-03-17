@@ -6,9 +6,9 @@ string xmlFileFullName = @"C:\Temp\3.xml";
 string xmlContent = File.ReadAllText(xmlFileFullName)
     .Replace("env:","").Replace("ns1:","")
     ;
-XmlDocument xDoc = new XmlDocument();
+XmlDocument xDoc = new();
 xDoc.LoadXml(xmlContent);
-XmlNamespaceManager ns = new XmlNamespaceManager(  xDoc.NameTable);
+XmlNamespaceManager ns = new(  xDoc.NameTable);
 ns.AddNamespace("env:","http://www.w3.org/2003/05/soap-envelope");
 ns.AddNamespace("ns1:","https://service.ameropa.de/nbc/nbc.wsdl");
 //new XmlParser().Parse(xDoc.SelectSingleNode("env:Envelope", ns));

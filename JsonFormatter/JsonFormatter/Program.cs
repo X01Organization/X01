@@ -8,7 +8,7 @@ Parser.Default
       .WithParsed(o =>
        {
            JsonObject? outputJsonString = null;
-           using (var s = File.OpenRead(o.Input))
+           using (FileStream s = File.OpenRead(o.Input))
            {
                outputJsonString = JsonSerializer.Deserialize<JsonObject>(s);
            }

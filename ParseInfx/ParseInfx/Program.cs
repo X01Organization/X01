@@ -2,7 +2,7 @@
 string[] lines = File.ReadAllLines(@"C:\Temp\1.txt");
 IEnumerable<string[]> infos = lines.Select(x=> x.Split(' ').Take(8).ToArray());
 string names = string.Join(Environment.NewLine, infos.Select(x=> x[0]));
-Dictionary<string, string> result = new Dictionary<string, string>() { 
+Dictionary<string, string> result = new() { 
 {"Version","version"},
 {"Marke","brand"},
 {"Abflughafen_Hin","Departure_Airport"},

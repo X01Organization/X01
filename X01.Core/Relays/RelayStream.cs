@@ -11,7 +11,7 @@ public class RelayStream : Stream
     {
         get
         {
-            var v = _stream.CanRead;
+            bool v = _stream.CanRead;
             LogInformation(v);
             return v;
         }
@@ -21,7 +21,7 @@ public class RelayStream : Stream
     {
         get
         {
-            var v = _stream.CanSeek;
+            bool v = _stream.CanSeek;
             LogInformation(v);
             return v;
         }
@@ -31,7 +31,7 @@ public class RelayStream : Stream
     {
         get
         {
-            var v = _stream.CanWrite;
+            bool v = _stream.CanWrite;
             LogInformation(v);
             return v;
         }
@@ -41,7 +41,7 @@ public class RelayStream : Stream
     {
         get
         {
-            var v = _stream.Length;
+            long v = _stream.Length;
             LogInformation(v);
             return v;
         }
@@ -51,14 +51,14 @@ public class RelayStream : Stream
     {
         get
         {
-            var v = _stream.Position;
+            long v = _stream.Position;
             LogInformation(v, "GetPosition");
             return v;
         }
 
         set
         {
-            var v = value;
+            long v = value;
             LogInformation(v, "SetPosition");
             _stream.Position = v;
         }

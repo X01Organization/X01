@@ -14,7 +14,7 @@ namespace ContentfulModelGenerator
 
         public async Task GenerateAsync(CancellationToken token = default)
         {
-            using HttpClient httpClient = new HttpClient();
+            using HttpClient httpClient = new();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AUTH);
             HttpResponseMessage response = await httpClient.GetAsync(URL);
             string test = await response.Content.ReadAsStringAsync();
@@ -31,7 +31,7 @@ namespace ContentfulModelGenerator
 
         private void WriteObjectType(JsonNode jsonNode)
         {
-            Dictionary<string, List<string>> testssss = new Dictionary<string, List<string>>();
+            Dictionary<string, List<string>> testssss = new();
             JsonNode? items = jsonNode.AsObject()["items"];
             foreach (JsonNode? z in items!.AsArray())
             {
@@ -67,7 +67,7 @@ testssss.Add( entryTypeId, lst );
 
         private async Task GenerateAsync(CfModel cfModel, CancellationToken token)
         {
-            DirectoryInfo dir = new DirectoryInfo("c:/workroot/Contentful/");
+            DirectoryInfo dir = new("c:/workroot/Contentful/");
             if (dir.Exists)
             {
                 dir.Delete(true);
@@ -75,8 +75,8 @@ testssss.Add( entryTypeId, lst );
 
             dir.Create();
 
-            List<string> allLocalizedFields = new List<string>();
-            StringBuilder typeIdSb = new StringBuilder();
+            List<string> allLocalizedFields = new();
+            StringBuilder typeIdSb = new();
 
             typeIdSb.AppendLine("using System.Collections.ObjectModel;");
             typeIdSb.AppendLine();
@@ -97,11 +97,11 @@ testssss.Add( entryTypeId, lst );
                 bool isdestination = new[] { "Continent", "Country", "Region", "City", "Highlight", }
                 .Contains(GetFieldName(x.Sys.Id));
 
-                StringBuilder sb1 = new StringBuilder();
+                StringBuilder sb1 = new();
                 await GenerateModelAsync(sb1, x, token);
                 string content = sb1.ToString();
 
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 if (content.Contains("Json") || isdestination)
                 {
                     sb.AppendLine("using System.Text.Json.Serialization;");
@@ -166,7 +166,7 @@ testssss.Add( entryTypeId, lst );
 
             foreach (CfModelItems x in cfModel.Items)
             {
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 sb.AppendLine("using System.Collections.Generic;");
                 sb.AppendLine("using System.Text.Json.Serialization;");
                 sb.AppendLine("using API.Contentful.Core;");

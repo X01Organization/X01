@@ -32,7 +32,7 @@ Generate2();
         string[] lines = File.ReadAllLines("C:\\workroot\\1.txt");
         string[] headers = new[] { "accommodation.hotel", "accommodation.room", "accommodation.parking", };
 
-        List<Info> all = new List<Info>();
+        List<Info> all = new();
         foreach (string? x in lines.Skip(2))
         {
             Console.WriteLine("");
@@ -47,7 +47,7 @@ Generate2();
 
     private void writeFile(string file,List<Info> all, bool germanKey)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         foreach (Info? x in all.DistinctBy(x => new
         {
             x.header,

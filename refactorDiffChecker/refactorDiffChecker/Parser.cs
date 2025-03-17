@@ -1,12 +1,10 @@
-﻿using System.Collections.ObjectModel;
-
-namespace refactorDiffChecker
+﻿namespace refactorDiffChecker
 {
     public class Parser
     {
         public List<List<string>> GetChangedFiles(string[] lines)
         {
-            List<List<string>> changedFiles = new List<List<string>>();
+            List<List<string>> changedFiles = new();
             List<string> changedFile = null;
             int i = 0;
             while (lines.Length > i)
@@ -36,7 +34,7 @@ namespace refactorDiffChecker
 
         private bool GetChanges(ref string[] lines, out string changes)
         {
-            List<string> changedLines = new List<string>();
+            List<string> changedLines = new();
             char changeSign = lines[0][0];
             System.Diagnostics.Debug.Assert('+' == changeSign || '-' == changeSign);
             int i = 0;
@@ -63,7 +61,7 @@ namespace refactorDiffChecker
                                          || fileChanges[0].StartsWith("--- /dev/null"));
             System.Diagnostics.Debug.Assert(fileChanges[1].StartsWith("+++ b/")
                                          || fileChanges[1].StartsWith("+++ /dev/null"));
-            var fc = new FileChanges(new Changes(fileChanges[0].Substring(6), fileChanges[1].Substring(6)));
+            FileChanges fc = new FileChanges(new Changes(fileChanges[0].Substring(6), fileChanges[1].Substring(6)));
             string[] lines = fileChanges.Skip(2).ToArray();
             string removed;
             string added;
@@ -94,7 +92,7 @@ namespace refactorDiffChecker
 
         private bool removeSameIgnore(List<Changes> ignoreChanges, ref string removed, ref string added)
         {
-            foreach (var i in ignoreChanges)
+            foreach (Changes i in ignoreChanges)
             {
                 if (removed.StartsWith(i.Removed) && added.StartsWith(i.Added))
                 {
@@ -135,7 +133,7 @@ namespace refactorDiffChecker
             return i > 0;
         }
 
-        public HashSet<Changes> CommentChanges = new HashSet<Changes>();
+        public HashSet<Changes> CommentChanges = new();
 
         public Changes GetChanges(List<Changes> ignoreChanges, string removed, string added)
         {
@@ -147,7 +145,7 @@ namespace refactorDiffChecker
             if (removed.TrimStart().StartsWith("//") || removed.Contains("\"") || removed.Contains("\'") ||
                 added.TrimStart().StartsWith("//") || added.Contains("\"") || added.Contains("\'"))
             {
-                var c = new Changes(removed, added);
+                Changes c = new Changes(removed, added);
                 CommentChanges.Add(c);
                 return new Changes(null, null);
             }
@@ -160,7 +158,7 @@ namespace refactorDiffChecker
                     !removed.Contains("table: \"tourop")
                 ))
             {
-                var c = new Changes(removed, added);
+                Changes c = new Changes(removed, added);
                 CommentChanges.Add(c);
                 return new Changes(null, null);
             }
@@ -174,7 +172,7 @@ namespace refactorDiffChecker
                 )
                )
             {
-                var c = new Changes(removed, added);
+                Changes c = new Changes(removed, added);
                 CommentChanges.Add(c);
                 return new Changes(null, null);
             }

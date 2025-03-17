@@ -8,10 +8,10 @@ public class LogParser
 {
     public async Task<IEnumerable<LogEntry> > ParseAsync(string tag, Stream logStream, CancellationToken token)
     {
-        var log = await logStream.ReadToEndAsync();
+        string log = await logStream.ReadToEndAsync();
                 string pattern = @"(?<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{4}) \[(?<threadId>\d+)\] (?<logType>\w+) \[(?<logLevel>\w+)\] \[(?<classNamespace>[\w.]+)\] - (?<message>[\s\S]*?)(?=\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{4} \[|\z)";
-                Regex regex = new Regex(pattern);
-                var matches = regex.Matches(log);
+                Regex regex = new(pattern);
+        MatchCollection matches = regex.Matches(log);
   // Process each match
   return matches.Select(match=> new LogEntry
             {

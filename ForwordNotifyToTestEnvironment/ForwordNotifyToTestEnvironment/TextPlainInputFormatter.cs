@@ -14,7 +14,7 @@ namespace ForwardNotifyToTestEnvironment
     public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
     {
             HttpRequest request = context.HttpContext.Request;
-        using (StreamReader reader = new StreamReader(request.Body))
+        using (StreamReader reader = new(request.Body))
         {
             string content = await reader.ReadToEndAsync();
             return await InputFormatterResult.SuccessAsync(content);

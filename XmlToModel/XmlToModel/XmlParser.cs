@@ -6,7 +6,7 @@ namespace XmlToModel
     {
         public void Parse(XmlNode node)
         {
-            Dictionary<string, string> rr = new Dictionary<string, string>() {
+            Dictionary<string, string> rr = new() {
                {"Angebotsnummer","quotenumber"},
 {"Saison","season"},
 {"Name","Surname"},

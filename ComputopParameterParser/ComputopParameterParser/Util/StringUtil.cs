@@ -5,7 +5,7 @@
         public static string[] Split(string s, int limit = 100)
         {
             string[] sa = SplitBySymbole(s).Select(x => x.Length > limit ? SplitByDimiliter(x, ' ') : new string[] { x }).SelectMany(x => x).ToArray();
-            List<string> result = new List<string>();
+            List<string> result = new();
             string[] ss = sa;
             while (0 < ss.Length)
             {

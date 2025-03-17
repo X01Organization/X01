@@ -9,8 +9,8 @@ public class JsonDeserializer
     public async Task DeserializeAsync(IoCmdLineOption ioCmdLineOption, CancellationToken token)
     {
         string ttt = await File.ReadAllTextAsync(ioCmdLineOption.InputFileOrDirectory!);
-        var ss = TryDeserialize(ttt);
-        var ts = ss?.ToJsonString(new JsonSerializerOptions() { WriteIndented = true, }) ?? ttt;
+        JsonNode? ss = TryDeserialize(ttt);
+        string ts = ss?.ToJsonString(new JsonSerializerOptions() { WriteIndented = true, }) ?? ttt;
         await File.WriteAllTextAsync(ioCmdLineOption.OutputFileOrDirectory!, ts);
     }
 
@@ -18,7 +18,7 @@ public class JsonDeserializer
     {
         try
         {
-            var jsonNode = JsonSerializer.Deserialize<JsonNode>(maybeJson);
+            JsonNode? jsonNode = JsonSerializer.Deserialize<JsonNode>(maybeJson);
             return TryDeserialize(jsonNode);
         }
         catch (Exception)
@@ -33,10 +33,10 @@ public class JsonDeserializer
         {
             if (jsonNode is JsonObject jsonObject)
             {
-                var newJsonObject = new JsonObject();
-                foreach ((var key, var value) in jsonObject)
+                JsonObject newJsonObject = new JsonObject();
+                foreach ((string? key, JsonNode? value) in jsonObject)
                 {
-                    var newValue = TryDeserialize(value) ?? value?.DeepClone();
+                    JsonNode? newValue = TryDeserialize(value) ?? value?.DeepClone();
                     newJsonObject.Add(key, newValue);
                 }
                 return newJsonObject;
@@ -44,10 +44,10 @@ public class JsonDeserializer
 
             if (jsonNode is JsonArray jsonArray)
             {
-                var newJsonArray = new JsonArray();
-                foreach (var value in jsonArray)
+                JsonArray newJsonArray = new JsonArray();
+                foreach (JsonNode? value in jsonArray)
                 {
-                    var newValue = TryDeserialize(value) ?? value?.DeepClone();
+                    JsonNode? newValue = TryDeserialize(value) ?? value?.DeepClone();
                     newJsonArray.Add(newValue);
                 }
                 return newJsonArray;
@@ -55,11 +55,11 @@ public class JsonDeserializer
 
             if (jsonNode is JsonValue jsonValue)
             {
-                var value = jsonValue.GetValue<JsonElement>();
+                JsonElement value = jsonValue.GetValue<JsonElement>();
                 if (value.ValueKind == JsonValueKind.String)
                 {
-                    var s = jsonValue.GetValue<string>();
-                    var newJsonNode = TryDeserialize(s);
+                    string s = jsonValue.GetValue<string>();
+                    JsonNode? newJsonNode = TryDeserialize(s);
                     if (null != newJsonNode)
                     {
                         return newJsonNode;
@@ -67,13 +67,13 @@ public class JsonDeserializer
                     else
                     {
                         //s = Regex.Unescape(s);
-                        var sa = Regex.Split(s, "\r\n|\r|\n");
+                        string[] sa = Regex.Split(s, "\r\n|\r|\n");
                         if (sa.Length > 1)
                         {
-                            var newJsonArray = new JsonArray();
-                            foreach (var si in sa)
+                            JsonArray newJsonArray = new JsonArray();
+                            foreach (string si in sa)
                             {
-                                var newItemJsonNode = TryDeserialize(si) ?? JsonValue.Create(si);
+                                JsonNode newItemJsonNode = TryDeserialize(si) ?? JsonValue.Create(si);
                                 newJsonArray.Add(newItemJsonNode);
                             }
                             return newJsonArray;

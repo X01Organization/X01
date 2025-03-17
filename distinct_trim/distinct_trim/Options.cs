@@ -1,6 +1,4 @@
-﻿using CommandLine;
-
-namespace distinct_trim
+﻿namespace distinct_trim
 {
     public class Options
     {

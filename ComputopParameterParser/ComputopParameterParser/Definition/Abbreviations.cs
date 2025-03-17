@@ -7,7 +7,7 @@ namespace ComputopParameterParser.Definition
     /// </summary>
     public sealed class Abbreviations
     {
-        private static readonly Dictionary<string, JsonSchemaInfo> _dict = new Dictionary<string, JsonSchemaInfo>()
+        private static readonly Dictionary<string, JsonSchemaInfo> _dict = new()
         {
             {"CND", new JsonSchemaInfo() {IsRequired = false}},
             {"M", new JsonSchemaInfo() {IsRequired = true}},

@@ -12,7 +12,7 @@ string[][] lineInfos = lines.Select(x => x.Split('\t')).ToArray();
     {
         throw new Exception("Not valid line: " + string.Join('\t', info));
     }
-    DefinitioinInfo di = new DefinitioinInfo(info[0], info[1], info[2], info[3]
+    DefinitioinInfo di = new(info[0], info[1], info[2], info[3]
         .Replace(" " + ((char)160).ToString() + " ", " ")
         .Replace(((char)160).ToString() + " ", " ")
         .Replace(" " + ((char)160).ToString(), " ")
@@ -23,7 +23,7 @@ string[][] lineInfos = lines.Select(x => x.Split('\t')).ToArray();
     jsi.IsRequired = abjsi.IsRequired;
     return (di, jsi);
 }).ToArray();
-Dictionary<Type, string> specialNames = new Dictionary<Type,string>()
+Dictionary<Type, string> specialNames = new()
 {
     { typeof(long), "long" },
     { typeof(int), "int" },
@@ -33,13 +33,14 @@ File.WriteAllText(@"C:\Temp\1.cs", string.Join(Environment.NewLine, dijsis.Selec
 {
     DefinitioinInfo di = dijsi.di;
     JsonSchemaInfo jsi = dijsi.jsi;
-    List<string> comments = new List<string> {
+    List<string> comments = new()
+    {
         "<summary>",
         di.Format + "   " + di.Condition,
         "</summary>",
     };
 
-    List<string> codes = new List<string>(){
+    List<string> codes = new(){
         "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]",
         $"[JsonPropertyName(\"{di.Name}\")]",
         "public " + (specialNames.ContainsKey(jsi.Type)?specialNames[jsi.Type]:jsi.Type.Name.ToLower()) + " " + char.ToUpper( di.Name[0])  + di.Name.Substring(1)+ " { get; set; }",

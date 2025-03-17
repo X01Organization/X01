@@ -31,12 +31,12 @@ public class Reporter
 #endif
     public async Task ReportAsync(CancellationToken token)
     {
-        var httpqueryFiles = new DirectoryInfo(_option.InputOrDirectory).GetFiles("httpquery*.log");
-        LogParser.LogParser logParser = new LogParser.LogParser();
+        FileInfo[] httpqueryFiles = new DirectoryInfo(_option.InputOrDirectory).GetFiles("httpquery*.log");
+        LogParser.LogParser logParser = new();
 
-        foreach (var httpqueryFile in httpqueryFiles)
+        foreach (FileInfo httpqueryFile in httpqueryFiles)
         {
-            var outputFilename = Path.Join(_option.OutputDirectory, httpqueryFile.Name + ".report.json");
+            string outputFilename = Path.Join(_option.OutputDirectory, httpqueryFile.Name + ".report.json");
             if (File.Exists(outputFilename) && !httpqueryFile.Name.Equals("httpquery.log", StringComparison.OrdinalIgnoreCase))
             {
                 Console.WriteLine("skipped {0}", httpqueryFile.Name);
@@ -44,12 +44,12 @@ public class Reporter
             }
             Console.WriteLine("reporting {0}", httpqueryFile.Name);
 
-            await using var logStream = httpqueryFile.OpenRead();
-            var logEntries = (await logParser.ParseAsync(httpqueryFile.Directory.Name, logStream, token)).ToArray();
+            await using FileStream logStream = httpqueryFile.OpenRead();
+            LogParser.LogEntry[] logEntries = (await logParser.ParseAsync(httpqueryFile.Directory.Name, logStream, token)).ToArray();
             var info = logEntries.Select(x =>
               {
                   string protocal = string.Empty;
-                  var m = Regex.Match(x.Message, @"^HTTP\/\d.\d ");
+                  Match m = Regex.Match(x.Message, @"^HTTP\/\d.\d ");
                   if (m.Success)
                   {
                       protocal = m.Groups[0].Value;
@@ -66,8 +66,8 @@ public class Reporter
                       schema = schema.TrimEnd();
                   }
 
-                  var url = string.Empty;
-                  var args = string.Empty;
+                  string url = string.Empty;
+                  string args = string.Empty;
                   int urlEndIndex = x.Message.IndexOf(' ');
                   if (0 > urlEndIndex)
                   {
@@ -107,7 +107,7 @@ public class Reporter
                 .ThenByDescending(x => x.DistinctRequestCount)
                 .ToArray();
 
-            var output = JsonSerializer.Serialize(info);
+            string output = JsonSerializer.Serialize(info);
 
             await File.WriteAllTextAsync(outputFilename, output, token);
         }

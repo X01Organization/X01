@@ -3,7 +3,7 @@
 using refactorDiffChecker;
 using System.Text.RegularExpressions;
 
-List<Changes> ignorChanges = new List<Changes>()
+List<Changes> ignorChanges = new()
 {
     //new Changes("SERVICE", "ACTIVITY"),
     //new Changes("Service", "Activity"),
@@ -17,17 +17,17 @@ List<Changes> ignorChanges = new List<Changes>()
     new Changes("ArrivalDate", "ArrivalTime"),
     new Changes("DepartureDate", "DepartureTime"),
 };
-var lines = File.ReadAllLines("C:\\Users\\zxiang\\project\\1.diff");
+string[] lines = File.ReadAllLines("C:\\Users\\zxiang\\project\\1.diff");
 
-using (var fs = new FileStream("c:\\temp\\result.diff", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+using (FileStream fs = new FileStream("c:\\temp\\result.diff", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
 {
-    using (var sw = new StreamWriter(fs))
+    using (StreamWriter sw = new StreamWriter(fs))
     {
-        var parser = new Parser();
-        var changedFiles = parser.GetChangedFiles(lines);
-        foreach (var fileChanges in changedFiles)
+        Parser parser = new Parser();
+        List<List<string>> changedFiles = parser.GetChangedFiles(lines);
+        foreach (List<string> fileChanges in changedFiles)
         {
-            var changes = parser.GetChanges(fileChanges);
+            FileChanges changes = parser.GetChanges(fileChanges);
             if (changes.FilenameChanges.Removed.EndsWith("ev/null")
              && changes.FilenameChanges.Added.StartsWith("Backend/Backend.DB/Migrations/TourOperator/"))
             {
@@ -37,7 +37,7 @@ using (var fs = new FileStream("c:\\temp\\result.diff", FileMode.Create, FileAcc
             bool hasChanges = false;
             if (changes.FilenameChanges.Removed != changes.FilenameChanges.Added)
             {
-                var ffc = parser.GetChanges(ignorChanges, changes.FilenameChanges.Removed,
+                Changes ffc = parser.GetChanges(ignorChanges, changes.FilenameChanges.Removed,
                     changes.FilenameChanges.Added);
                 if (!ffc.NoChange)
                 {
@@ -49,7 +49,7 @@ using (var fs = new FileStream("c:\\temp\\result.diff", FileMode.Create, FileAcc
                 }
             }
 
-            foreach (var change in changes.Changes)
+            foreach (Changes change in changes.Changes)
             {
                 string[] removedLines =
                     null == change.Removed ? Array.Empty<string>() : Regex.Split(change.Removed, "\r\n|\r|\n");
@@ -61,7 +61,7 @@ using (var fs = new FileStream("c:\\temp\\result.diff", FileMode.Create, FileAcc
                     int i = 0;
                     while (i < removedLines.Length)
                     {
-                        var c = parser.GetChanges(ignorChanges, removedLines[i], addedLines[i]);
+                        Changes c = parser.GetChanges(ignorChanges, removedLines[i], addedLines[i]);
                         if (!c.NoChange)
                         {
                             hasChanges = true;
@@ -94,7 +94,7 @@ using (var fs = new FileStream("c:\\temp\\result.diff", FileMode.Create, FileAcc
             }
         }
 
-        foreach (var c in parser.CommentChanges)
+        foreach (Changes c in parser.CommentChanges)
         {
             System.Diagnostics.Debug.WriteLine("{\"" + c.Removed.Replace("\'", "\\\'").Replace("\"", "\\\"") + "\",\"" +
                                                c.Added.Replace("\'", "\\\'").Replace("\"", "\\\"") + "\"}");

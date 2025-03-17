@@ -17,18 +17,18 @@ public static class IoCmdLineOptionExt
             throw new ArgumentException("No input file or directory specified");
         }
 
-        var inputFileOrDirectory = option.InputFileOrDirectory;
+        string inputFileOrDirectory = option.InputFileOrDirectory;
         FileAttributes attr = File.GetAttributes(inputFileOrDirectory);
         if (attr.HasFlag(FileAttributes.Directory))
         {
-            var directoryInfo = new DirectoryInfo(inputFileOrDirectory);
-            var infputFiles = directoryInfo.GetFiles("*", new EnumerationOptions()
+            DirectoryInfo directoryInfo = new DirectoryInfo(inputFileOrDirectory);
+            FileInfo[] infputFiles = directoryInfo.GetFiles("*", new EnumerationOptions()
             {
                 MaxRecursionDepth = 10000,
                 RecurseSubdirectories = true,
                 ReturnSpecialDirectories = false,
             });
-            foreach (var x in infputFiles)
+            foreach (FileInfo x in infputFiles)
             {
                 await fileHandler.Invoke(x, x);
             }

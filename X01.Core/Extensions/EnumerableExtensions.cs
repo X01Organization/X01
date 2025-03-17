@@ -5,7 +5,7 @@ public static class EnumerableExtensions
 {
     private static object InvokeEnumerableMethod(object enumerable, Type methodGenericType, [CallerMemberName] string methodName = "")
     {
-        var enumerableMethod = typeof(Enumerable).GetMethod(methodName);
+        System.Reflection.MethodInfo enumerableMethod = typeof(Enumerable).GetMethod(methodName);
         if (null == enumerableMethod)
         {
             throw new ArgumentException($"{nameof(methodName)}({methodName}) not found");

@@ -71,14 +71,14 @@
                 }
                 else
                 {
-                    foreach (var x in TryEnumerateFilesInTopDirectory(di))
+                    foreach (FileInfo x in TryEnumerateFilesInTopDirectory(di))
                     {
                         yield return x;
                     }
 
-                    foreach (var x in TryEnumerateDirectoriesInTopDirectory(di))
+                    foreach (DirectoryInfo x in TryEnumerateDirectoriesInTopDirectory(di))
                     {
-                        foreach (var y in TryEnumerateFilesInAllDirectories(x))
+                        foreach (FileInfo y in TryEnumerateFilesInAllDirectories(x))
                         {
                             yield return y;
                         }
@@ -93,7 +93,7 @@
 
         public void DoJob()
         {
-            var allFileInfos = _searchingDirectories.Select(x => new DirectoryInfo(x))
+            IEnumerable<FileInfo> allFileInfos = _searchingDirectories.Select(x => new DirectoryInfo(x))
                                                     .SelectMany(TryEnumerateFilesInAllDirectories);
 
             if (0 < _searchingExtensions.Length)
@@ -101,7 +101,7 @@
                 allFileInfos = allFileInfos.Where(x => _searchingExtensions.Contains(x.Extension.ToLower()));
             }
 
-            foreach (var fileInfosWithSameSize in allFileInfos.GroupBy(x => x.Length).OrderBy(x => x.Key))
+            foreach (IGrouping<long, FileInfo>? fileInfosWithSameSize in allFileInfos.GroupBy(x => x.Length).OrderBy(x => x.Key))
             {
                 try
                 {
@@ -118,9 +118,9 @@
 
         private List<FileInfo> FindDuplicatedFiles(IEnumerable<FileInfo> fileInfosWithSameSize)
         {
-            List<FileInfo> uniqueFiles = new List<FileInfo>();
-            List<FileInfo> duplicatedFiles = new List<FileInfo>();
-            foreach (var x in fileInfosWithSameSize)
+            List<FileInfo> uniqueFiles = new();
+            List<FileInfo> duplicatedFiles = new();
+            foreach (FileInfo x in fileInfosWithSameSize)
             {
                 Console.WriteLine("comparing " + x.FullName);
                 if (uniqueFiles.Contains(x))
@@ -166,10 +166,10 @@
 
         private void MoveDuplicatedFiles(IEnumerable<FileInfo> duplicatedFiles)
         {
-            foreach (var x in duplicatedFiles)
+            foreach (FileInfo x in duplicatedFiles)
             {
                 Console.WriteLine("moving " + x.FullName);
-                var newFullName = GetUniqueName(new DirectoryInfo(_duplicatedFileDirectory).FullName,
+                string newFullName = GetUniqueName(new DirectoryInfo(_duplicatedFileDirectory).FullName,
                     Path.GetFileNameWithoutExtension(x.Name), x.Extension);
                 x.MoveTo(newFullName);
             }
@@ -238,14 +238,14 @@
 
             try
             {
-                using (var s1 = fi1.OpenRead())
+                using (FileStream s1 = fi1.OpenRead())
                 {
-                    using (var s2 = fi2.OpenRead())
+                    using (FileStream s2 = fi2.OpenRead())
                     {
                         while (true)
                         {
-                            var b1 = s1.ReadByte();
-                            var b2 = s2.ReadByte();
+                            int b1 = s1.ReadByte();
+                            int b2 = s2.ReadByte();
                             if (b1 != b2)
                             {
                                 return false;

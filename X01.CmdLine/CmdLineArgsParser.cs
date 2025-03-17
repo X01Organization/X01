@@ -10,7 +10,7 @@ public class CmdLineArgsParser
     public T Parse<T>(string[] args) where T : class
     {
         Console.WriteLine("paring args:{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, args));
-        var cmdLineArgs = Parse(args);
+        IEnumerable<CmdLineArg> cmdLineArgs = Parse(args);
         return Convert<T>(cmdLineArgs);
     }
 
@@ -18,27 +18,27 @@ public class CmdLineArgsParser
     {
         CmdLineArg? lastLongOrShortArg = null;
         //https://regex101.com/r/FADDVO/1
-        var shortArgRegex = new Regex(@"^(\-{1})([a-zA-Z0-9]+)(=(.+))?$");
-        var longArgRegex = new Regex(@"^(\-{2})([a-zA-Z0-9_\-]+)(=(.+))?$");
-        foreach (var x in args)
+        Regex shortArgRegex = new Regex(@"^(\-{1})([a-zA-Z0-9]+)(=(.+))?$");
+        Regex longArgRegex = new Regex(@"^(\-{2})([a-zA-Z0-9_\-]+)(=(.+))?$");
+        foreach (string x in args)
         {
-            var longArgMatch = longArgRegex.Match(x);
+            Match longArgMatch = longArgRegex.Match(x);
             if (longArgMatch.Success)
             {
-                var name = longArgMatch.Groups[2].Value;
-                var value = longArgMatch.Groups[4].Value;
-                var arg = new CmdLineLongArg(name, value);
+                string name = longArgMatch.Groups[2].Value;
+                string value = longArgMatch.Groups[4].Value;
+                CmdLineLongArg arg = new CmdLineLongArg(name, value);
                 lastLongOrShortArg = arg;
                 yield return arg;
             }
             else
             {
-                var shortArgMatch = shortArgRegex.Match(x);
+                Match shortArgMatch = shortArgRegex.Match(x);
                 if (shortArgMatch.Success)
                 {
-                    var name = shortArgMatch.Groups[2].Value;
-                    var value = shortArgMatch.Groups[4].Value;
-                    var arg = new CmdLineShortArgs(name, value);
+                    string name = shortArgMatch.Groups[2].Value;
+                    string value = shortArgMatch.Groups[4].Value;
+                    CmdLineShortArgs arg = new CmdLineShortArgs(name, value);
                     lastLongOrShortArg = arg;
                     yield return arg;
                 }
@@ -65,28 +65,28 @@ public class CmdLineArgsParser
            ? cmdLineShortArgs.Args.Cast<CmdLineArg>()
            : new[] { x });
 
-        var cmdLineShortArgsByName = cmdLineArgs
+        ILookup<string, CmdLineShortArg> cmdLineShortArgsByName = cmdLineArgs
             .Where(x => x is CmdLineShortArg)
             .Cast<CmdLineShortArg>()
             .ToLookup(x => x.Name);
 
-        var cmdLineLongArgsByName = cmdLineArgs
+        ILookup<string, CmdLineLongArg> cmdLineLongArgsByName = cmdLineArgs
             .Where(x => x is CmdLineLongArg)
             .Cast<CmdLineLongArg>()
             .ToLookup(x => x.Name);
 
-        var values = cmdLineArgs
+        IEnumerable<string?> values = cmdLineArgs
             .Where(x => x is not CmdLineLongArg && x is not CmdLineLongArg)
             .Select(x => x.Value);
 
-        var properties = typeof(T).GetProperties();
-        var t = Activator.CreateInstance<T>();
+        PropertyInfo[] properties = typeof(T).GetProperties();
+        T t = Activator.CreateInstance<T>();
 
-        foreach (var x in properties)
+        foreach (PropertyInfo x in properties)
         {
-            foreach (var y in x.GetCustomAttributes(typeof(CmdLineArgsAttribute), true).Cast<CmdLineArgsAttribute>())
+            foreach (CmdLineArgsAttribute y in x.GetCustomAttributes(typeof(CmdLineArgsAttribute), true).Cast<CmdLineArgsAttribute>())
             {
-                List<string?> propertyValues = new List<string?>();
+                List<string?> propertyValues = new();
                 if (!string.IsNullOrWhiteSpace(y.ShortName) &&
                     cmdLineShortArgsByName.Contains(y.ShortName!))
                 {
@@ -108,7 +108,7 @@ public class CmdLineArgsParser
 
     private void SetPropertyValues<T>(T t, PropertyInfo propertyInfo, List<string?> propertyValues)
     {
-        var value = ChangeType(propertyValues, propertyInfo.PropertyType);
+        object? value = ChangeType(propertyValues, propertyInfo.PropertyType);
         propertyInfo.SetValue(t, value);
     }
 
@@ -127,13 +127,13 @@ public class CmdLineArgsParser
 
         if (typeof(IEnumerable).IsAssignableFrom(type) && typeof(string) != type)
         {
-            var genericType = type.GetGenericArguments().Single();
+            Type genericType = type.GetGenericArguments().Single();
             return strings.Select(x => ChangeType(x, genericType))
                 .Cast(genericType)
                 .ToList(genericType);
         }
 
-        var s = strings.SingleOrDefault();
+        string? s = strings.SingleOrDefault();
 
         return ChangeType(s, type);
     }

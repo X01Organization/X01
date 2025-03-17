@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 
-var base64JsonString =  args[0];
+string base64JsonString =  args[0];
 if (!string.IsNullOrEmpty(base64JsonString))
 {
     byte[] jsonBytes = null;
@@ -18,5 +18,5 @@ if (!string.IsNullOrEmpty(base64JsonString))
         jsonBytes = Convert.FromBase64String(base64JsonString);
     }
 
-    var base64JsonParameterJsonObject = JsonSerializer.Deserialize<JsonObject>(jsonBytes);
+    JsonObject? base64JsonParameterJsonObject = JsonSerializer.Deserialize<JsonObject>(jsonBytes);
 }

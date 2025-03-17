@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace X01
 {
     public sealed class Rectangles
     {
-        readonly List<Rectangle> _rects = new List<Rectangle>();
+        private readonly List<Rectangle> _rects = new();
         public void Append(params Rectangle[] rects)
         {
             _rects.AddRange(rects);

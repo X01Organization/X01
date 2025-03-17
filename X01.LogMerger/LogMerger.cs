@@ -5,7 +5,7 @@ namespace X01.LogMerger;
 
 public class LogMerger
 {
-    private readonly List<string> _ignored_logs = new List<string>(){ 
+    private readonly List<string> _ignored_logs = new(){ 
         "FAPI query errors during last 5 minutes:",
         "invalid_nirvana_trips",
         "Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: The database operation was expected to affect",
@@ -60,10 +60,10 @@ public class LogMerger
 
     public async Task MergeAsync(string[] logFiles, CancellationToken token)
     {
-        var logs1 = new List<LogEntry>();
-        foreach (var x in logFiles.Skip(1))
+        List<LogEntry> logs1 = new List<LogEntry>();
+        foreach (string? x in logFiles.Skip(1))
         {
-            var logs = await MergeAsync(x, token);
+            IEnumerable<LogEntry> logs = await MergeAsync(x, token);
             logs1.AddRange(logs);
         }
 
@@ -98,8 +98,8 @@ public class LogMerger
 
     public async Task<IEnumerable<LogEntry>> MergeAsync(string logFile, CancellationToken token)
     {
-        var fi = new FileInfo(logFile);
-        await using var logStream = fi.OpenRead();
+        FileInfo fi = new FileInfo(logFile);
+        await using FileStream logStream = fi.OpenRead();
         return await _logParser.ParseAsync(fi.Directory!.Name, logStream, token);
     }
 }

@@ -7,8 +7,8 @@ public class NullableRemover
 {
     public async Task RemoveAsync(Option option, CancellationToken token)
     {
-        var inputFileOrDirectory = option.InputFileOrDirectory!;
-        var nullableEnabled = option.NullableEnabled ?? true;
+        string inputFileOrDirectory = option.InputFileOrDirectory!;
+        bool nullableEnabled = option.NullableEnabled ?? true;
         Console.WriteLine("trimming " + inputFileOrDirectory + " encoding=" + Encoding.Default + ",nullableEnabled=" + nullableEnabled);
         FileAttributes attr = File.GetAttributes(inputFileOrDirectory);
         if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
@@ -23,13 +23,13 @@ public class NullableRemover
 
     private async Task RemoveAsync(FileInfo fileInfo, bool nullableEnabled, CancellationToken token)
     {
-        var lines = File.ReadAllLines(fileInfo.FullName);
-        var indexNullableEnable = lines.Select((x, i) => new { Index = i, Line = x, })
+        string[] lines = File.ReadAllLines(fileInfo.FullName);
+        int? indexNullableEnable = lines.Select((x, i) => new { Index = i, Line = x, })
             .FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Line) &&
                                   Regex.IsMatch(x.Line, @"^\s*#nullable\s+enable\s*$"))
             ?.Index;
 
-        var indexNullableDisable = lines.Select((x, i) => new { Index = i, Line = x, })
+        int? indexNullableDisable = lines.Select((x, i) => new { Index = i, Line = x, })
             .FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Line) &&
                                   Regex.IsMatch(x.Line, @"^\s*#nullable\s+disable\s*$"))
             ?.Index;
@@ -48,11 +48,11 @@ public class NullableRemover
             return;
         }
 #else
-        var newLines = AdjustNullable(nullableEnabled, lines, indexNullableEnable, indexNullableDisable).ToArray();
+        string[] newLines = AdjustNullable(nullableEnabled, lines, indexNullableEnable, indexNullableDisable).ToArray();
 #endif
         if (!newLines.SequenceEqual(lines))
         {
-            var newText = string.Join(Environment.NewLine, newLines);
+            string newText = string.Join(Environment.NewLine, newLines);
             await File.WriteAllTextAsync(fileInfo.FullName, newText.TrimStart());
         }
     }
@@ -92,11 +92,6 @@ public class NullableRemover
         return lines;
     }
 
-    private IEnumerable<string> AddNullableEnable(IEnumerable<string> lines)
-    {
-        return lines.Prepend("#nullable enable");
-    }
-
     private IEnumerable<string> AddNullableDisable(IEnumerable<string> lines)
     {
         return lines.Prepend("#nullable disable");
@@ -110,14 +105,14 @@ public class NullableRemover
     private async Task RemoveAsync(DirectoryInfo directoryInfo, bool nullableEnabled, CancellationToken token)
     {
         Console.WriteLine("trimming " + directoryInfo.FullName);
-        var files = directoryInfo.GetFiles("*.cs");
-        foreach (var x in files)
+        FileInfo[] files = directoryInfo.GetFiles("*.cs");
+        foreach (FileInfo x in files)
         {
             await RemoveAsync(x, nullableEnabled, token);
         }
 
-        var directories = directoryInfo.GetDirectories();
-        foreach (var x in directories)
+        DirectoryInfo[] directories = directoryInfo.GetDirectories();
+        foreach (DirectoryInfo x in directories)
         {
             await RemoveAsync(x, nullableEnabled, token);
         }

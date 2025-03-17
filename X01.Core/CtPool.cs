@@ -2,7 +2,7 @@
 {
     public sealed class CtReplacer : ADisposable
     {
-        CancellationTokenSource? cts;
+        private CancellationTokenSource? cts;
 
         public CtReplacer()
         {

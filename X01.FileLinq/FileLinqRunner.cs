@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using X01.CmdLine;
 using X01.Core.Extensions;
@@ -9,8 +8,8 @@ public static class FileLinqRunner
 {
     public static async Task RunAsync(string[] args, CancellationToken token)
     {
-        var option = new CmdLineArgsParser().Parse<FileLinqOption>(args);
-        var callingAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+        FileLinqOption option = new CmdLineArgsParser().Parse<FileLinqOption>(args);
+        string? callingAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
         //await new Reporter(option).ReportAsync(default);
         if ("json".Equals(option.Format, StringComparison.OrdinalIgnoreCase))
         {
@@ -18,9 +17,9 @@ public static class FileLinqRunner
         else
         {
 
-            foreach (var action in option.Actions!)
+            foreach (string action in option.Actions!)
             {
-                var lines = File.ReadLinesAsync(option.SourceFile!, token);
+                IAsyncEnumerable<string> lines = File.ReadLinesAsync(option.SourceFile!, token);
                 AsyncEnumerableExtension.InvokeAsyncEnumerableMethod(lines, typeof(string), action);
             }
         }
@@ -34,10 +33,10 @@ public static class FileLinqRunner
     private static async Task WriteToJsonFileAsync(IAsyncEnumerable<string> asyncEnumerable, string filePath)
         {
             // Create a FileStream to write to the JSON file
-            await using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+            await using (FileStream stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
             {
                 // Create a StreamWriter to write JSON data to the FileStream
-                await using (var writer = new StreamWriter(stream))
+                await using (StreamWriter writer = new StreamWriter(stream))
                 {
                     // Write the opening bracket of the JSON array
                     await writer.WriteAsync("[");
@@ -46,14 +45,14 @@ public static class FileLinqRunner
                     bool isFirstItem = true;
 
                     // Iterate over the async enumerable
-                    await foreach (var item in asyncEnumerable)
+                    await foreach (string item in asyncEnumerable)
                     {
                         // If this is not the first item, add a comma separator
                         if (!isFirstItem)
                             await writer.WriteAsync(",");
 
-                        // Serialize the string item to JSON
-                        var jsonString = JsonSerializer.Serialize(item);
+                    // Serialize the string item to JSON
+                    string jsonString = JsonSerializer.Serialize(item);
 
                         // Write the JSON string to the file
                         await writer.WriteAsync(jsonString);

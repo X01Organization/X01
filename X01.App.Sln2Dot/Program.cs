@@ -1,34 +1,29 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
-        var workspace = MSBuildWorkspace.Create();
-        var solution = await workspace.OpenSolutionAsync(@"C:\workroot\env\config\vscode\workspace\ja\sln\all.sln");
+        MSBuildWorkspace workspace = MSBuildWorkspace.Create();
+        Solution solution = await workspace.OpenSolutionAsync(@"C:\workroot\env\config\vscode\workspace\ja\sln\all.sln");
 
-        List<string> callGraph = new List<string>();
+        List<string> callGraph = new();
 
-        foreach (var project in solution.Projects)
+        foreach (Project project in solution.Projects)
         {
-            foreach (var document in project.Documents)
+            foreach (Document document in project.Documents)
             {
-                var root = await document.GetSyntaxRootAsync();
+                SyntaxNode? root = await document.GetSyntaxRootAsync();
 
                 // Look for method calls in the code
-                var methodInvocations = root!.DescendantNodes()
+                IEnumerable<InvocationExpressionSyntax> methodInvocations = root!.DescendantNodes()
                     .OfType<InvocationExpressionSyntax>();
 
-                foreach (var invocation in methodInvocations)
+                foreach (InvocationExpressionSyntax invocation in methodInvocations)
                 {
-                    var methodName = invocation.Expression.ToString();
+                    string methodName = invocation.Expression.ToString();
                     callGraph.Add(methodName);
                 }
             }

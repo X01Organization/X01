@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Text.Json;
 using createsql;
 
 try{
@@ -12,7 +11,7 @@ try{
 }
 
 
-Dictionary<string, long> tabledict = new Dictionary<string, long>()
+Dictionary<string, long> tabledict = new()
 {
     {"tourop_trip_cost_flight",236237733 },
     {"tourop_trip_cost_carrental",56948462 },

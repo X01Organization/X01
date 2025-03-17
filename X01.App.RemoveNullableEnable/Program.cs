@@ -2,5 +2,5 @@
 using X01.App.RemoveNullableEnable;
 using X01.CmdLine;
 
-var option = new CmdLineArgsParser().Parse<Option>(args);
+Option option = new CmdLineArgsParser().Parse<Option>(args);
 await new NullableRemover().RemoveAsync(option, default);

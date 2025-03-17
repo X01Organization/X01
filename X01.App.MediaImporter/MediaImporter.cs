@@ -6,7 +6,7 @@ public class MediaImporter
 {
     private readonly string[] _specialDirectories =
           new[] { "lost+found", "$RECYCLE.BIN", "System Volume Information", };
-    private readonly HashSet<string> _notInodes  = new HashSet<string>();
+    private readonly HashSet<string> _notInodes  = new();
 
     public async Task ImportAsync(Option option, CancellationToken token)
     {
@@ -16,9 +16,9 @@ public class MediaImporter
             return;
         }
 
-        var outputDirectoryInfo = new DirectoryInfo(option.OutputDirectory);
+        DirectoryInfo outputDirectoryInfo = new DirectoryInfo(option.OutputDirectory);
 
-        var inputs = GetInputFileSystemInfos(option.InputFilesOrDirectories).ToArray();
+        FileSystemInfo[] inputs = GetInputFileSystemInfos(option.InputFilesOrDirectories).ToArray();
         if (1 > inputs.Length)
         {
             Console.WriteLine("missing the input files or directories!");
@@ -53,7 +53,7 @@ public class MediaImporter
             yield break;
         }
 
-        foreach (var x in inputFilesOrDirectories)
+        foreach (string x in inputFilesOrDirectories)
         {
             if (File.Exists(x))
             {
@@ -110,19 +110,19 @@ public class MediaImporter
             yield break;
         }
 
-        foreach (var x in TryEnumerateFilesInTopDirectory(di))
+        foreach (FileInfo x in TryEnumerateFilesInTopDirectory(di))
         {
             yield return x;
         }
 
-        foreach (var x in TryEnumerateDirectoriesInTopDirectory(di))
+        foreach (DirectoryInfo x in TryEnumerateDirectoriesInTopDirectory(di))
         {
             if (IsOutputDirectory(x, outputDirectoryInfo))
             {
                 continue;
             }
 
-            foreach (var y in TryEnumerateFilesInAllDirectories(x, outputDirectoryInfo))
+            foreach (FileInfo y in TryEnumerateFilesInAllDirectories(x, outputDirectoryInfo))
             {
                 yield return y;
             }
@@ -131,13 +131,13 @@ public class MediaImporter
 
     private async Task ImportAsync(FileSystemInfo[] inputFileSystemInfos, DirectoryInfo outputDirectoryInfo, List<string> extensions, CancellationToken token)
     {
-        var allInputFiles = GetAllInputImageFileInfos(inputFileSystemInfos, outputDirectoryInfo, extensions);
+        IEnumerable<FileInfo> allInputFiles = GetAllInputImageFileInfos(inputFileSystemInfos, outputDirectoryInfo, extensions);
 
-        foreach (var fileInfosWithSameSize in allInputFiles.GroupBy(x => x.Length).OrderBy(x => x.Key))
+        foreach (IGrouping<long, FileInfo>? fileInfosWithSameSize in allInputFiles.GroupBy(x => x.Length).OrderBy(x => x.Key))
         {
             try
             {
-                var resultFiles = RemoveDuplicatedFiles(fileInfosWithSameSize);
+                List<FileInfo> resultFiles = RemoveDuplicatedFiles(fileInfosWithSameSize);
                 MoveToOutputDirectory(resultFiles, outputDirectoryInfo);
             }
             catch (Exception ex)
@@ -151,7 +151,7 @@ public class MediaImporter
 
     private IEnumerable<FileInfo> GetAllInputImageFileInfos(FileSystemInfo[] inputFileSystemInfos, DirectoryInfo outputDirectoryInfo, List<string> extensions)
     {
-        foreach (var x in inputFileSystemInfos.DistinctBy(x=> x.FullName))
+        foreach (FileSystemInfo? x in inputFileSystemInfos.DistinctBy(x=> x.FullName))
         {
             if (x is FileInfo inputFileInfo)
             {
@@ -163,7 +163,7 @@ public class MediaImporter
 
             if (x is DirectoryInfo inputDirectoryInfo)
             {
-                foreach (var y in TryEnumerateFilesInAllDirectories(inputDirectoryInfo, outputDirectoryInfo))
+                foreach (FileInfo y in TryEnumerateFilesInAllDirectories(inputDirectoryInfo, outputDirectoryInfo))
                 {
                     if (IsGoodSizeImage(y, extensions))
                     {
@@ -197,15 +197,15 @@ public class MediaImporter
 
     private List<FileInfo> RemoveDuplicatedFiles(IEnumerable<FileInfo> fileInfosWithSameSize)
     {
-        List<FileInfo> uniqueFiles = new List<FileInfo>();
-        foreach (var x in fileInfosWithSameSize)
+        List<FileInfo> uniqueFiles = new();
+        foreach (FileInfo x in fileInfosWithSameSize)
         {
             if (uniqueFiles.Select(y=> y.FullName).Contains(x.FullName))
             {
                 throw new Exception(x.FullName + " already exists in uniqueFiles");
             }
 
-            var existFile = uniqueFiles.FirstOrDefault(y => IsSame(x, y));
+            FileInfo? existFile = uniqueFiles.FirstOrDefault(y => IsSame(x, y));
 
             if (null == existFile)
             {
@@ -215,7 +215,7 @@ public class MediaImporter
             {
                 ThrowIfSameInode(existFile, x);
 
-                var minDatetime = GetFileMinDateTime(existFile, x);
+                DateTime minDatetime = GetFileMinDateTime(existFile, x);
                 if (minDatetime < existFile.LastWriteTime)
                 {
                     File.SetLastWriteTime(existFile.FullName, minDatetime);
@@ -231,18 +231,18 @@ public class MediaImporter
 
     private void MoveToOutputDirectory(IEnumerable<FileInfo> results, DirectoryInfo outputDirectoryInfo)
     {
-        foreach (var x in results)
+        foreach (FileInfo x in results)
         {
             if (!x.Exists)
             {
                 continue;
             }
 
-            var dateTime = GetFileMinDateTime(x);
+            DateTime dateTime = GetFileMinDateTime(x);
 
-            var folder = dateTime.Year.ToString();
+            string folder = dateTime.Year.ToString();
 
-            var outputDir = outputDirectoryInfo.FullName;
+            string outputDir = outputDirectoryInfo.FullName;
 
             if(ShouldbeXXXX(x, dateTime))
             { 
@@ -251,7 +251,7 @@ public class MediaImporter
 
             outputDir = Path.Combine(outputDir, folder , dateTime.ToString("MM"));
 
-            var outputdirinfo = new DirectoryInfo(outputDir);
+            DirectoryInfo outputdirinfo = new DirectoryInfo(outputDir);
             if (outputdirinfo.Exists)
             {
                 RemoveDuplicatedFiles(outputdirinfo.GetFiles().Where(y => y.Length == x.Length).Append(x));
@@ -262,8 +262,8 @@ public class MediaImporter
                 continue;
             }
 
-            var newFullName = GetUniqueName(outputDir, Path.GetFileNameWithoutExtension(x.Name), x.Extension);
-            var targetFileInfo = new FileInfo(newFullName);
+            string newFullName = GetUniqueName(outputDir, Path.GetFileNameWithoutExtension(x.Name), x.Extension);
+            FileInfo targetFileInfo = new FileInfo(newFullName);
             if (!targetFileInfo.Directory!.Exists)
             {
                 targetFileInfo.Directory.Create();
@@ -275,13 +275,13 @@ public class MediaImporter
     }
 
     private bool ShouldbeXXXX(FileInfo fi, DateTime minDateTime) 
-    { 
-        var nameWithoutExt = Path.GetFileNameWithoutExtension(fi.Name);
+    {
+        string nameWithoutExt = Path.GetFileNameWithoutExtension(fi.Name);
         if(!nameWithoutExt.StartsWith("IMG_", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
-var maybeDateTimeName = nameWithoutExt.Substring(4);
+        string maybeDateTimeName = nameWithoutExt.Substring(4);
 
         if (!DateTime.TryParseExact(maybeDateTimeName, "yyyyMMdd_HHmmssfff", CultureInfo.CurrentCulture, DateTimeStyles.None, 
             out DateTime maybeDateTime))
@@ -346,22 +346,22 @@ var maybeDateTimeName = nameWithoutExt.Substring(4);
             return;
         }
 
-        var inode = $"{fi1.Directory!.FullName} <> {fi2.Directory!.FullName}";
+        string inode = $"{fi1.Directory!.FullName} <> {fi2.Directory!.FullName}";
         if(_notInodes.Contains(inode))
         {
             return;
         }
 
-        var testFile1 = Path.Combine(fi1.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
+        string testFile1 = Path.Combine(fi1.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
         if(File.Exists(testFile1))
-        { 
-           var ss = new FileInfo(testFile1);
+        {
+            FileInfo ss = new FileInfo(testFile1);
            ss.Delete();
         }
-        var testFile2 = Path.Combine(fi2.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
+        string testFile2 = Path.Combine(fi2.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
         if(File.Exists(testFile2))
-        { 
-           var ss = new FileInfo(testFile2);
+        {
+            FileInfo ss = new FileInfo(testFile2);
             ss.Delete();
         }
         File.WriteAllText(testFile1, "1");
@@ -376,7 +376,7 @@ var maybeDateTimeName = nameWithoutExt.Substring(4);
             throw new UnreachableException($"3: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
         }
 
-        var ss1 = new FileInfo(testFile1);
+        FileInfo ss1 = new FileInfo(testFile1);
         ss1.Delete();
 
         bool added = _notInodes.Add(inode);
@@ -395,14 +395,14 @@ var maybeDateTimeName = nameWithoutExt.Substring(4);
 
         try
         {
-            using (var s1 = fi1.OpenRead())
+            using (FileStream s1 = fi1.OpenRead())
             {
-                using (var s2 = fi2.OpenRead())
+                using (FileStream s2 = fi2.OpenRead())
                 {
                     while (true)
                     {
-                        var b1 = s1.ReadByte();
-                        var b2 = s2.ReadByte();
+                        int b1 = s1.ReadByte();
+                        int b2 = s2.ReadByte();
                         if (b1 != b2)
                         {
                             return false;

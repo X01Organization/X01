@@ -6,9 +6,9 @@ using (FileStream stream = File.Open("C:\\workroot\\1.xls", FileMode.Open, FileA
     // Auto-detect format, supports:
     //  - Binary Excel files (2.0-2003 format; *.xls)
     //  - OpenXml Excel files (2007 format; *.xlsx, *.xlsb)
-    using (var reader = ExcelReaderFactory.CreateReader(stream))
+    using (IExcelDataReader reader = ExcelReaderFactory.CreateReader(stream))
     {
-        var result = reader.AsDataSet();
+        System.Data.DataSet result = reader.AsDataSet();
         int a = 0;
     }
 }

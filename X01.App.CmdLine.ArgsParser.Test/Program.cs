@@ -11,11 +11,11 @@ using X01.CmdLine;
         // Convert IEnumerable to IQueryable
         IQueryable<int> queryableNumbers = numbers.AsQueryable();
 
-        // Use IQueryable (e.g., for LINQ queries)
-        var evenNumbers = queryableNumbers.Where(n => n % 2 == 0);
+// Use IQueryable (e.g., for LINQ queries)
+IQueryable<int> evenNumbers = queryableNumbers.Where(n => n % 2 == 0);
 
         // Output the results
-        foreach (var number in evenNumbers)
+        foreach (int number in evenNumbers)
         {
             Console.WriteLine(number);
         }
@@ -36,13 +36,13 @@ switch (a11)
 
 
 double? n = null;
-var tt1 = n > 4;
-var tt2 = 4 > n;
-var tt3 = n > n;
+bool tt1 = n > 4;
+bool tt2 = 4 > n;
+bool tt3 = n > n;
 
 string ttt123 = await File.ReadAllTextAsync("C:\\workroot\\json\\0.json");
-var jsonNode = JsonSerializer.Deserialize<JsonNode>(ttt123);
-foreach (var x1 in jsonNode!.AsArray())
+JsonNode? jsonNode = JsonSerializer.Deserialize<JsonNode>(ttt123);
+foreach (JsonNode? x1 in jsonNode!.AsArray())
 {
     x1.GetPropertyName();
 }
@@ -51,7 +51,7 @@ int ii = 0;
 while (ii < int.MaxValue)
 {
     //var sa123 = new testStream(@"C:\workroot\data\downloads\Dev Meeting-20240202_103246-Meeting Recording.mp4", FileMode.Open, FileAccess.Read, FileShare.Read);
-    var sf1 = new JsonContent("{}");
+    JsonContent sf1 = new JsonContent("{}");
     GC.Collect();
     GC.Collect(3);
     Console.WriteLine($"=>>>> {ii++}");
@@ -62,9 +62,9 @@ while (ii < int.MaxValue)
 
 
 int a111 = 3;
-var s = (uint) a111 - 4;
+uint s = (uint) a111 - 4;
 
-var lines1 = await File.ReadAllLinesAsync("C:\\workroot\\project\\dotnetcore-tools\\Nirvana\\bin\\Debug\\net8.0\\log\\error.txt");
+string[] lines1 = await File.ReadAllLinesAsync("C:\\workroot\\project\\dotnetcore-tools\\Nirvana\\bin\\Debug\\net8.0\\log\\error.txt");
 var tttest =
 lines1.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => new { line = x, match = Regex.Match(x, @".*\((.+)\).+\((.+)\).*") }).Select(x =>
 {
@@ -84,12 +84,12 @@ lines1.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => new { line = x, mat
 .Distinct()
 .OrderBy(x => x.travelcode)
 .ToArray();
-var csv = string.Join(Environment.NewLine, tttest.Select(x => $"{x.travelcode};{x.day}").Prepend("TravelCode;Day"));
+string csv = string.Join(Environment.NewLine, tttest.Select(x => $"{x.travelcode};{x.day}").Prepend("TravelCode;Day"));
 
 string ttt = await File.ReadAllTextAsync("C:\\workroot\\data\\downloads\\test9.json");
-var ss = JsonSerializer.Deserialize<JsonNode>(ttt);
+JsonNode? ss = JsonSerializer.Deserialize<JsonNode>(ttt);
 
-var ttt1 = ss.AsArray().Select(x => x.AsObject()["line"]).Select(x => new
+string[] ttt1 = ss.AsArray().Select(x => x.AsObject()["line"]).Select(x => new
 {
     type = x.GetType(),
     value = x.GetValue<string>(),
@@ -101,17 +101,17 @@ new Class1().Test();
 
 string timePeriodsString = " 8~10 10:30~12 13~17:25 18:10~19:05 18:00~10 ";
 
-var matchRegex = new Regex(@"\s*?(?<Delimiter>[\s,|;])\s*(?<StartHour>\d{1,2})(?::(?<StartMinute>\d{1,2}))?\s*~\s*(?<EndHour>\d{1,2})(?::(?<EndMinute>\d{1,2}))?\s*?");
+Regex matchRegex = new Regex(@"\s*?(?<Delimiter>[\s,|;])\s*(?<StartHour>\d{1,2})(?::(?<StartMinute>\d{1,2}))?\s*~\s*(?<EndHour>\d{1,2})(?::(?<EndMinute>\d{1,2}))?\s*?");
 //var matchRegex = new Regex(@"\b(?<StartHour>\d{1,2})(?::(?<StartMinute>\d{1,2}))?\s*~\s*(?<EndHour>\d{1,2})(?::(?<EndMinute>\d{1,2}))?\b"); 
-var matches = matchRegex.Matches(" " + timePeriodsString);
+MatchCollection matches = matchRegex.Matches(" " + timePeriodsString);
 
 
 
-var lines = await File.ReadAllLinesAsync("C:\\workroot\\1233425647");
-var ttes = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('\t').Take(3).ToArray())
+string[] lines = await File.ReadAllLinesAsync("C:\\workroot\\1233425647");
+string[] ttes = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('\t').Take(3).ToArray())
     .Select(x => "{\"" + x[0].Trim() + "\", " + x[2] + "}" + " // " + x[1])
     .ToArray();
-var tt = string.Join(Environment.NewLine, ttes);
+string tt = string.Join(Environment.NewLine, ttes);
 //using Adyen;
 
 //	using Adyen;
@@ -160,11 +160,11 @@ var tt = string.Join(Environment.NewLine, ttes);
 //        return left ;
 //    }).ToArray();
 
-var ss1 = new Regex(@"^\s*((\s(?<Hour>\d{1,2})(?::(?<Minute>\d{1,2}))?\s*~\s*(\d{1,2})(?::(\d{1,2}))?)*)\s*$");
-var m = ss1.Match("   8:01~10 10:30~12 13~17:25 18:10~19:05  ");
+Regex ss1 = new Regex(@"^\s*((\s(?<Hour>\d{1,2})(?::(?<Minute>\d{1,2}))?\s*~\s*(\d{1,2})(?::(\d{1,2}))?)*)\s*$");
+Match m = ss1.Match("   8:01~10 10:30~12 13~17:25 18:10~19:05  ");
 
-var ss11 = m.Groups["Hour"];
-var ss22 = m.Groups["Minute"];
+Group ss11 = m.Groups["Hour"];
+Group ss22 = m.Groups["Minute"];
 
 
 

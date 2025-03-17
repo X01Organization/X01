@@ -12,7 +12,7 @@ namespace X01
             {
                 return (true);
             }
-            foreach (var x in enumerable)
+            foreach (object? x in enumerable)
             {
                 return (false);
             }

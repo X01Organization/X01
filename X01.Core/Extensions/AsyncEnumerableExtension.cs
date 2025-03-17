@@ -6,7 +6,7 @@ public static class AsyncEnumerableExtension
 {
     public static object InvokeAsyncEnumerableMethod(object asyncEnumerable, Type methodGenericType, [CallerMemberName] string methodName = "")
     {
-        var enumerableMethod = typeof(AsyncEnumerable).GetMethod(methodName);
+        System.Reflection.MethodInfo enumerableMethod = typeof(AsyncEnumerable).GetMethod(methodName);
         if (null == enumerableMethod)
         {
             throw new ArgumentException($"{nameof(methodName)}({methodName}) not found");

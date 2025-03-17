@@ -8,7 +8,7 @@ namespace ComputopParameterParser.Definition
     /// </summary>
     public sealed class DataFormats
     {
-        private static readonly Dictionary<string, JsonSchemaInfo> _dict = new Dictionary<string, JsonSchemaInfo>()
+        private static readonly Dictionary<string, JsonSchemaInfo> _dict = new()
         {
             { "", new JsonSchemaInfo(){Type  = typeof(string) } },
             { "a", new JsonSchemaInfo(){Type = typeof(string), Pattern = "[a-z]" } },

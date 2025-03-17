@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using CommandLine;
 using distinct_trim;
 
 Parser.Default

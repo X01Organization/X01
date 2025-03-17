@@ -3,8 +3,8 @@
 
     public class CancelableSource<TObject>
     {
-        readonly TObject _obj;
-        readonly CancellationToken? _ct;
+        private readonly TObject _obj;
+        private readonly CancellationToken? _ct;
         public TObject Obj
         {
             get
