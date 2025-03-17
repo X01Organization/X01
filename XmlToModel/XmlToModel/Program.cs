@@ -2,11 +2,11 @@
 using System.Xml;
 using XmlToModel;
 
-var xmlFileFullName = @"C:\Temp\3.xml";
-var xmlContent = File.ReadAllText(xmlFileFullName)
+string xmlFileFullName = @"C:\Temp\3.xml";
+string xmlContent = File.ReadAllText(xmlFileFullName)
     .Replace("env:","").Replace("ns1:","")
     ;
-var xDoc = new XmlDocument();
+XmlDocument xDoc = new XmlDocument();
 xDoc.LoadXml(xmlContent);
 XmlNamespaceManager ns = new XmlNamespaceManager(  xDoc.NameTable);
 ns.AddNamespace("env:","http://www.w3.org/2003/05/soap-envelope");

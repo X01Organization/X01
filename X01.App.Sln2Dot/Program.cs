@@ -7,14 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-class Program
+internal class Program
 {
-    static async Task Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var workspace = MSBuildWorkspace.Create();
         var solution = await workspace.OpenSolutionAsync(@"C:\workroot\env\config\vscode\workspace\ja\sln\all.sln");
 
-        var callGraph = new System.Collections.Generic.List<string>();
+        List<string> callGraph = new List<string>();
 
         foreach (var project in solution.Projects)
         {
@@ -35,8 +35,8 @@ class Program
         }
 
         // Output the call graph as a DOT file
-        var dotFilePath = "call_graph.dot";
-        var dotContent = "digraph CallGraph {\n" +
+        string dotFilePath = "call_graph.dot";
+        string dotContent = "digraph CallGraph {\n" +
                          string.Join("\n", callGraph.Distinct().Select(line => $"\"{line}\" -> \"some_method\";")) +
                          "\n}";
 

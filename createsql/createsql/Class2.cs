@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace createsql;
 public class Class2
 {
-    public async Task<int> TestAsync(){ 
+    public async Task<int> TestAsync(){
 
-        var t = Test1Async();
-        var t1 = t.ContinueWith(async x=>  await Test2Async());
+        Task t = Test1Async();
+        Task<Task> t1 = t.ContinueWith(async x=>  await Test2Async());
         await t1;
         await t;
         return 1;

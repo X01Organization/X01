@@ -14,38 +14,38 @@ namespace ContentfulModelGenerator
 
         public async Task GenerateAsync(CancellationToken token = default)
         {
-            using var httpClient = new HttpClient();
+            using HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AUTH);
-            var response = await httpClient.GetAsync(URL);
-            var test = await response.Content.ReadAsStringAsync();
+            HttpResponseMessage response = await httpClient.GetAsync(URL);
+            string test = await response.Content.ReadAsStringAsync();
 
             await File.WriteAllTextAsync("c:/workroot/contentfulModel.json", test, token);
 
-            var contentfulModel = JsonSerializer.Deserialize<JsonNode>(test)!;
+            JsonNode contentfulModel = JsonSerializer.Deserialize<JsonNode>(test)!;
 
             WriteObjectType(contentfulModel);
 
-            var cfModel = await response.Content.ReadFromJsonAsync<CfModel>();
+            CfModel? cfModel = await response.Content.ReadFromJsonAsync<CfModel>();
             await GenerateAsync(cfModel, token);
         }
 
         private void WriteObjectType(JsonNode jsonNode)
         {
             Dictionary<string, List<string>> testssss = new Dictionary<string, List<string>>();
-            var items = jsonNode.AsObject()["items"];
-            foreach (var z in items!.AsArray())
+            JsonNode? items = jsonNode.AsObject()["items"];
+            foreach (JsonNode? z in items!.AsArray())
             {
-                var x = z!.AsObject();
-                var fileds = x["fields"]!.AsArray();
-                foreach (var y in fileds)
+                JsonObject x = z!.AsObject();
+                JsonArray fileds = x["fields"]!.AsArray();
+                foreach (JsonNode? y in fileds)
                 {
-                    var property = y!.AsObject();
-                    var type = property["type"];
+                    JsonObject property = y!.AsObject();
+                    JsonNode? type = property["type"];
                     if (type!.GetValue<string>() == "Object")
                     {
-                        var imagePropertyId = property["id"]!.GetValue<string>();
-                        var entryTypeId = x["sys"]!.AsObject()["id"]!.GetValue<string>();
-                        if(!  testssss.TryGetValue(entryTypeId, out var lst)){ 
+                        string imagePropertyId = property["id"]!.GetValue<string>();
+                        string entryTypeId = x["sys"]!.AsObject()["id"]!.GetValue<string>();
+                        if(!  testssss.TryGetValue(entryTypeId, out List<string>? lst)){ 
 lst = new List<string>();
 testssss.Add( entryTypeId, lst );
                         }
@@ -56,8 +56,8 @@ testssss.Add( entryTypeId, lst );
                 }
             }
 
-            var test11j = string.Join('\n', testssss.Select(x=>x.Key + "\n\t" + string.Join("\n\t" ,x.Value.Select(y => y))).OrderBy(x=> x));
-            var test = string.Join('\n', testssss.SelectMany(x=> x.Value).Select(x=> $"    public Dictionary<string, ContentfulImage[] >? {char.ToUpper( x[0])}{x.Substring(1)}"+" { get; set; }"));
+            string test11j = string.Join('\n', testssss.Select(x=>x.Key + "\n\t" + string.Join("\n\t" ,x.Value.Select(y => y))).OrderBy(x=> x));
+            string test = string.Join('\n', testssss.SelectMany(x=> x.Value).Select(x=> $"    public Dictionary<string, ContentfulImage[] >? {char.ToUpper( x[0])}{x.Substring(1)}"+" { get; set; }"));
             int a3 = 0;
             if (a3 == 0)
             {
@@ -67,7 +67,7 @@ testssss.Add( entryTypeId, lst );
 
         private async Task GenerateAsync(CfModel cfModel, CancellationToken token)
         {
-            var dir = new DirectoryInfo("c:/workroot/Contentful/");
+            DirectoryInfo dir = new DirectoryInfo("c:/workroot/Contentful/");
             if (dir.Exists)
             {
                 dir.Delete(true);
@@ -75,8 +75,8 @@ testssss.Add( entryTypeId, lst );
 
             dir.Create();
 
-            var allLocalizedFields = new List<string>();
-            var typeIdSb = new StringBuilder();
+            List<string> allLocalizedFields = new List<string>();
+            StringBuilder typeIdSb = new StringBuilder();
 
             typeIdSb.AppendLine("using System.Collections.ObjectModel;");
             typeIdSb.AppendLine();
@@ -88,7 +88,7 @@ testssss.Add( entryTypeId, lst );
             typeIdSb.AppendLine();
 
 
-            foreach (var x in cfModel.Items.OrderBy(x => x.Sys.Id))
+            foreach (CfModelItems? x in cfModel.Items.OrderBy(x => x.Sys.Id))
             {
                 if (x.Sys.Id.Contains("test", StringComparison.OrdinalIgnoreCase))
                 {
@@ -97,11 +97,11 @@ testssss.Add( entryTypeId, lst );
                 bool isdestination = new[] { "Continent", "Country", "Region", "City", "Highlight", }
                 .Contains(GetFieldName(x.Sys.Id));
 
-                var sb1 = new StringBuilder();
+                StringBuilder sb1 = new StringBuilder();
                 await GenerateModelAsync(sb1, x, token);
-                var content = sb1.ToString();
+                string content = sb1.ToString();
 
-                var sb = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                 if (content.Contains("Json") || isdestination)
                 {
                     sb.AppendLine("using System.Text.Json.Serialization;");
@@ -141,7 +141,7 @@ testssss.Add( entryTypeId, lst );
 
                 typeIdSb.AppendLine($"    public const string {GetFieldName(x.Sys.Id)} = \"{x.Sys.Id}\";");
 
-                var localizedFields = x.Fields.Where(y => true == y.Localized)
+                string[] localizedFields = x.Fields.Where(y => true == y.Localized)
                     .Select(y => "$\"{" + GetFieldName(x.Sys.Id) + "}." + y.Id + "\"")
                     .ToArray();
                 allLocalizedFields.AddRange(localizedFields);
@@ -164,9 +164,9 @@ testssss.Add( entryTypeId, lst );
             //File.WriteAllText($"{dir.FullName}/ContentfulLocalizedFields.cs", sb5.ToString().Trim());
             return;
 
-            foreach (var x in cfModel.Items)
+            foreach (CfModelItems x in cfModel.Items)
             {
-                var sb = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                 sb.AppendLine("using System.Collections.Generic;");
                 sb.AppendLine("using System.Text.Json.Serialization;");
                 sb.AppendLine("using API.Contentful.Core;");
@@ -190,7 +190,7 @@ testssss.Add( entryTypeId, lst );
 
         private bool GetOrder(ref int order, string fieldName, string[] cmpfieldNames)
         {
-            foreach (var x in cmpfieldNames)
+            foreach (string x in cmpfieldNames)
             {
                 if (GetOrder1(ref order, fieldName, x))
                 {
@@ -215,13 +215,13 @@ testssss.Add( entryTypeId, lst );
         private async Task GenerateModelAsync(StringBuilder sb, CfModelItems cfModelItem, CancellationToken token)
         {
             await Task.Delay(1);
-            var allfields = cfModelItem.Fields.Where(x => true != x.Disabled).ToArray();
+            CfModelItemsFields[] allfields = cfModelItem.Fields.Where(x => true != x.Disabled).ToArray();
             int i = 0;
-            foreach (var x in allfields.OrderBy(x =>
+            foreach (CfModelItemsFields? x in allfields.OrderBy(x =>
             {
-                var fieldName = GetFieldName(x.Id);
+                string fieldName = GetFieldName(x.Id);
                 int order = 0;
-                var fieldNames = new[]
+                string[] fieldNames = new[]
                 {
                     "InternalName", "title", "Description", "productLine", "headline",
                 }.SelectMany(x => new[] { x, "sub" + x, }).ToArray();
@@ -236,7 +236,7 @@ testssss.Add( entryTypeId, lst );
                     return "zzzzzzzz" + fieldName;
                 }
 
-                var fieldTypeName = GetFieldTypeName(x);
+                string fieldTypeName = GetFieldTypeName(x);
                 if (fieldTypeName == "Link")
                 {
                     return "zzzz0000" + fieldName;
@@ -246,10 +246,10 @@ testssss.Add( entryTypeId, lst );
             }))
             {
                 ++i;
-                var fieldTypeName = GetFieldTypeName(x);
+                string fieldTypeName = GetFieldTypeName(x);
                 if ("Link" == fieldTypeName)
                 {
-                    var linkcontenttypes =
+                    string[] linkcontenttypes =
                         x.Validations.SelectMany(x => x!.LinkContentType).Where(x => null != x).ToArray();
                     if (1 == linkcontenttypes.Length && !x.Id.Contains("test", StringComparison.OrdinalIgnoreCase))
                     {
@@ -319,7 +319,7 @@ testssss.Add( entryTypeId, lst );
                 return null;
             }
 
-            var linkContentTypes = field.Items
+            string[] linkContentTypes = field.Items
                                         .Validations
                                         .SelectMany(x => x!.LinkContentType)
                                         .Where(x => null != x)
@@ -332,7 +332,7 @@ testssss.Add( entryTypeId, lst );
 
             if (1 < linkContentTypes.Length)
             {
-                var destinationTypeIds = new[]
+                string[] destinationTypeIds = new[]
                 {
                     "continent", "country", "highlight", "region", "city",
                 };
@@ -359,11 +359,11 @@ testssss.Add( entryTypeId, lst );
         private async Task GenerateAsync(StringBuilder sb, CfModelItems cfModelItem, CancellationToken token)
         {
             await Task.Delay(1);
-            foreach (var x in cfModelItem.Fields.Where(x => true != x.Disabled).OrderBy(x =>
+            foreach (CfModelItemsFields? x in cfModelItem.Fields.Where(x => true != x.Disabled).OrderBy(x =>
             {
-                var fieldName = GetFieldName(x.Id);
+                string fieldName = GetFieldName(x.Id);
                 int order = 0;
-                var fieldNames = new[]
+                string[] fieldNames = new[]
                 {
                     "InternalName", "title", "Description", "productLine", "headline",
                 }.SelectMany(x => new[] { x, "sub" + x, }).ToArray();
@@ -378,7 +378,7 @@ testssss.Add( entryTypeId, lst );
                     return "zzzzzzzz" + fieldName;
                 }
 
-                var fieldTypeName = GetFieldTypeName(x);
+                string fieldTypeName = GetFieldTypeName(x);
                 if (fieldTypeName == "Link")
                 {
                     return "zzzz0000" + fieldName;

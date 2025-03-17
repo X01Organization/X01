@@ -30,7 +30,7 @@ namespace ComputopParameterParser.Definition
         };
         public static JsonSchemaInfo GetJsonSchemaInfo(DefinitioinInfo di)
         {
-            var fmt = di.Format;
+            string fmt = di.Format;
             int len = FindDigitLength(fmt);
             JsonSchemaInfo jsi;
             if (len > 0)

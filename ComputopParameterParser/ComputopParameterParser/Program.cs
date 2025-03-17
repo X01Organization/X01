@@ -4,26 +4,26 @@ using ComputopParameterParser.Data;
 using ComputopParameterParser.Definition;
 using ComputopParameterParser.Util;
 
-var lines = File.ReadAllLines(@"C:\Temp\1");
-var lineInfos = lines.Select(x => x.Split('\t')).ToArray();
-var dijsis = lineInfos.Select(info =>
+string[] lines = File.ReadAllLines(@"C:\Temp\1");
+string[][] lineInfos = lines.Select(x => x.Split('\t')).ToArray();
+(DefinitioinInfo di, JsonSchemaInfo jsi)[] dijsis = lineInfos.Select(info =>
 {
     if (4 != info.Length)
     {
         throw new Exception("Not valid line: " + string.Join('\t', info));
     }
-    var di = new DefinitioinInfo(info[0], info[1], info[2], info[3]
+    DefinitioinInfo di = new DefinitioinInfo(info[0], info[1], info[2], info[3]
         .Replace(" " + ((char)160).ToString() + " ", " ")
         .Replace(((char)160).ToString() + " ", " ")
         .Replace(" " + ((char)160).ToString(), " ")
         .Replace(((char)160).ToString(), " ")
                                                                    );
-    var jsi = DataFormats.GetJsonSchemaInfo(di);
-    var abjsi = Abbreviations.GetJsonSchemaInfo(di);
+    JsonSchemaInfo jsi = DataFormats.GetJsonSchemaInfo(di);
+    JsonSchemaInfo abjsi = Abbreviations.GetJsonSchemaInfo(di);
     jsi.IsRequired = abjsi.IsRequired;
     return (di, jsi);
 }).ToArray();
-var specialNames = new Dictionary<Type,string>()
+Dictionary<Type, string> specialNames = new Dictionary<Type,string>()
 {
     { typeof(long), "long" },
     { typeof(int), "int" },
@@ -31,15 +31,15 @@ var specialNames = new Dictionary<Type,string>()
 };
 File.WriteAllText(@"C:\Temp\1.cs", string.Join(Environment.NewLine, dijsis.Select(dijsi =>
 {
-    var di = dijsi.di;
-    var jsi = dijsi.jsi;
-    var comments = new List<string> {
+    DefinitioinInfo di = dijsi.di;
+    JsonSchemaInfo jsi = dijsi.jsi;
+    List<string> comments = new List<string> {
         "<summary>",
         di.Format + "   " + di.Condition,
         "</summary>",
     };
-    
-    var codes = new List<string>(){
+
+    List<string> codes = new List<string>(){
         "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]",
         $"[JsonPropertyName(\"{di.Name}\")]",
         "public " + (specialNames.ContainsKey(jsi.Type)?specialNames[jsi.Type]:jsi.Type.Name.ToLower()) + " " + char.ToUpper( di.Name[0])  + di.Name.Substring(1)+ " { get; set; }",

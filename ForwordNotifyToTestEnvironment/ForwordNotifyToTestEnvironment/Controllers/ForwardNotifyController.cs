@@ -24,7 +24,7 @@ namespace ForwordNotifyToTestEnvironment.Controllers
             try
             {
                 _logger.LogInformation(">>>>received: " + dataAndLen);
-                var nameValueCollection = HttpUtility.ParseQueryString(dataAndLen);
+                System.Collections.Specialized.NameValueCollection nameValueCollection = HttpUtility.ParseQueryString(dataAndLen);
                 int len = 0;
                 string data = string.Empty;
                 foreach (string key in nameValueCollection.AllKeys.Where(x => !string.IsNullOrEmpty(x)))
@@ -39,17 +39,17 @@ namespace ForwordNotifyToTestEnvironment.Controllers
                         data = nameValueCollection[key] ?? String.Empty;
                     }
                 }
-                var url = "https://test.journaway.com/backend/api/payment/notify?auth=20Journaway19";
-                using var client = new HttpClient();
-                var values = new Dictionary<string, string> {
+                string url = "https://test.journaway.com/backend/api/payment/notify?auth=20Journaway19";
+                using HttpClient client = new HttpClient();
+                Dictionary<string, string> values = new Dictionary<string, string> {
                     { "data", data },
                     { "len", len.ToString() },
                 };
                 //neusta:9hX!X75fxh
-                var byteArray = new UTF8Encoding().GetBytes("neusta:9hX!X75fxh");
+                byte[] byteArray = new UTF8Encoding().GetBytes("neusta:9hX!X75fxh");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-                var formData = new FormUrlEncodedContent(values);
-                var response = await client.PostAsync(url, formData);
+                FormUrlEncodedContent formData = new FormUrlEncodedContent(values);
+                HttpResponseMessage response = await client.PostAsync(url, formData);
                 responseContent = response.Content.ReadAsStringAsync().Result;
                 response.EnsureSuccessStatusCode();
                 return Ok();

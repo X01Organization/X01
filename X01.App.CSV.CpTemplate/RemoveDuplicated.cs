@@ -3,8 +3,8 @@ internal class RemoveDuplicated
 {
     public async Task ExecuteAsync(CancellationToken token)
     {
-        var lines = await File.ReadAllLinesAsync("C:\\workroot\\test\\CostPositionFilterReport.csv", token);
-        var ss = 
+        string[] lines = await File.ReadAllLinesAsync("C:\\workroot\\test\\CostPositionFilterReport.csv", token);
+        string[] ss = 
         lines.Select(x => x.Split(';')).Select(x => new
         {
             Status = x[0],

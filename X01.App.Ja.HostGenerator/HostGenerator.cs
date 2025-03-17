@@ -2,8 +2,8 @@
 public class HostGenerator
 {
     public async Task GenerateAsync(CancellationToken token)
-    { 
-        var hostLines = await   File.ReadAllLinesAsync("C:\\workroot\\env\\doc\\journaway\\hosts", token);
+    {
+        string[] hostLines = await   File.ReadAllLinesAsync("C:\\workroot\\env\\doc\\journaway\\hosts", token);
         var hostInfos = 
         hostLines.Select(x=> x.Split('\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             .Where(x=> x.Length == 4)
@@ -11,7 +11,7 @@ public class HostGenerator
             .OrderBy(x=> x.Name)
             .ToArray();
 
-        var hosts = string.Join('\n',  hostInfos.Select(x=> $"{x.Ip.PadRight(3*4+3+1)} {x.Domain}"));
+        string hosts = string.Join('\n',  hostInfos.Select(x=> $"{x.Ip.PadRight(3*4+3+1)} {x.Domain}"));
         hosts = @"127.0.0.1 localhost
 127.0.1.1 x01
 
@@ -28,9 +28,9 @@ ff02::2 ip6-allrouters
         await File.WriteAllTextAsync("C:\\workroot\\env\\sys\\linux\\xhome\\hosts", hosts);
 
 
-        var names = string.Join(Environment.NewLine, hostInfos.Select(x=>"{" + $"\"{x.Name}\",".PadRight(20)+" \"\"" + "},").ToList());
+        string names = string.Join(Environment.NewLine, hostInfos.Select(x=>"{" + $"\"{x.Name}\",".PadRight(20)+" \"\"" + "},").ToList());
 
-        var config = string.Join('\n',  hostInfos.Select(x=> $@"Host {x.Name}
+        string config = string.Join('\n',  hostInfos.Select(x=> $@"Host {x.Name}
     HostName {x.Domain}
     ServerAliveInterval 60
     User zxiang 
@@ -54,8 +54,8 @@ Host synology
     }
 
     private string GetName(string name)
-    { 
-        var dict = new Dictionary<string, string>(){ 
+    {
+        Dictionary<string, string> dict = new Dictionary<string, string>(){ 
 {"TEST",              "test_svc"}             ,
 {"Product",           "product"}             ,
 {"Grafana",           "grafana"}                     ,
@@ -86,7 +86,7 @@ Host synology
 {"NGINX Test",        "test_nginx"}                  ,
         };
 
-        var test= dict.ToDictionary(x=> x.Value, x=> x.Key);
+        Dictionary<string, string> test = dict.ToDictionary(x=> x.Value, x=> x.Key);
         return dict[ name];
     }
 }

@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
-var lines = File.ReadAllLines(@"C:\Temp\1.txt");
-var infos = lines.Select(x=> x.Split(' ').Take(8).ToArray());
-var names = string.Join(Environment.NewLine, infos.Select(x=> x[0]));
+string[] lines = File.ReadAllLines(@"C:\Temp\1.txt");
+IEnumerable<string[]> infos = lines.Select(x=> x.Split(' ').Take(8).ToArray());
+string names = string.Join(Environment.NewLine, infos.Select(x=> x[0]));
 Dictionary<string, string> result = new Dictionary<string, string>() { 
 {"Version","version"},
 {"Marke","brand"},
@@ -36,6 +36,6 @@ Dictionary<string, string> result = new Dictionary<string, string>() {
 {"Vollzahler_Max","fullpayer_max"},
 {"Währung","currency"},
 };
-var ss = string.Join(Environment.NewLine , infos.Select(x=> $"/// <summary>{Environment.NewLine}/// {x[7].ToLowerInvariant() } {x[0]}{Environment.NewLine}/// [{(Convert.ToInt32( x[1])-1)},{(Convert.ToInt32( x[2])-1)}] {(Convert.ToInt32( x[3]))} {Environment.NewLine}/// </summary> {Environment.NewLine} public  string  {result[x[0]].Substring(0,1).ToUpperInvariant()}{result[x[0]].Substring(1)} " + "{get;set;}" ) );
-var ss1 = string.Join(Environment.NewLine , infos.Select(x=> $"infxModel.{result[x[0]]} = InterpretAt(line,{(Convert.ToInt32( x[1])-1)},{(Convert.ToInt32( x[3]))} );"));
+string ss = string.Join(Environment.NewLine , infos.Select(x=> $"/// <summary>{Environment.NewLine}/// {x[7].ToLowerInvariant() } {x[0]}{Environment.NewLine}/// [{(Convert.ToInt32( x[1])-1)},{(Convert.ToInt32( x[2])-1)}] {(Convert.ToInt32( x[3]))} {Environment.NewLine}/// </summary> {Environment.NewLine} public  string  {result[x[0]].Substring(0,1).ToUpperInvariant()}{result[x[0]].Substring(1)} " + "{get;set;}" ) );
+string ss1 = string.Join(Environment.NewLine , infos.Select(x=> $"infxModel.{result[x[0]]} = InterpretAt(line,{(Convert.ToInt32( x[1])-1)},{(Convert.ToInt32( x[3]))} );"));
 int a =0;

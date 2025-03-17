@@ -42,6 +42,14 @@ public class LogMerger
         "Npgsql.NpgsqlException (0x80004005): Failed to connect to",
         "Npgsql.PostgresException (0x80004005): 57P03: the database system is shutting down",
         "Npgsql.PostgresException (0x80004005): 57P03: the database system is starting up",
+        "(0x80004005): The connection pool has been exhausted, either raise",
+        "Could not process spookie, the scary tracking cookie. Parsed content:"",
+        ").DayDescription must be set",
+        "Missing translationKey=contentful.accommodation.room.Whirlpool",
+        ".dayDescription must have content because",
+        ") not found in contentful",
+        "Hangfire.PostgreSql.PostgreSqlDistributedLockException",
+        "SixLabors.ImageSharp.Formats.ImageFormatManager.ThrowInvalidDecoder",
     };
     private readonly LogParser.LogParser _logParser;
 

@@ -6,7 +6,8 @@ using createsql;
 try{
     int result = await new Class2().TestAsync();
     int b = 0;
-}catch(Exception ex){ 
+}catch (Exception _)
+{ 
     int a = 0;
 }
 

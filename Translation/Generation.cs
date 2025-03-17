@@ -10,8 +10,8 @@ Generate2();
     }
  public void Generate3()
     {
-        var lines = File.ReadAllLines("C:\\workroot\\3.txt");
-        var test = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('|'))
+        string[] lines = File.ReadAllLines("C:\\workroot\\3.txt");
+        List<Info> test = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('|'))
             .Select(x => new Info() { english = x[0].Trim(), german = x[1].Trim(), header = "transport", })
             .ToList();
         writeFile("c:/workroot/translation3.json", test, false);
@@ -20,8 +20,8 @@ Generate2();
 
     public void Generate2()
     {
-        var lines = File.ReadAllLines("C:\\workroot\\2.txt");
-        var test = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('|'))
+        string[] lines = File.ReadAllLines("C:\\workroot\\2.txt");
+        List<Info> test = lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Split('|'))
             .Select(x => new Info() { english = x[0].Trim(), german = x[1].Trim(), header = "transport", })
             .ToList();
         writeFile("c:/workroot/translation2.json", test, false);
@@ -29,11 +29,11 @@ Generate2();
 
     public void Generate1()
     {
-        var lines = File.ReadAllLines("C:\\workroot\\1.txt");
-        var headers = new[] { "accommodation.hotel", "accommodation.room", "accommodation.parking", };
+        string[] lines = File.ReadAllLines("C:\\workroot\\1.txt");
+        string[] headers = new[] { "accommodation.hotel", "accommodation.room", "accommodation.parking", };
 
         List<Info> all = new List<Info>();
-        foreach (var x in lines.Skip(2))
+        foreach (string? x in lines.Skip(2))
         {
             Console.WriteLine("");
             Console.WriteLine("=============>");
@@ -48,7 +48,7 @@ Generate2();
     private void writeFile(string file,List<Info> all, bool germanKey)
     {
         StringBuilder sb = new StringBuilder();
-        foreach (var x in all.DistinctBy(x => new
+        foreach (Info? x in all.DistinctBy(x => new
         {
             x.header,
             x.german,
@@ -91,24 +91,24 @@ Generate2();
     }
     private IEnumerable<Info> generate(string[] headers, string line)
     {
-        var columns = line.Split('\t').Select(x => x.Trim()).ToArray();
+        string[] columns = line.Split('\t').Select(x => x.Trim()).ToArray();
         if (18 != columns.Length)
         {
             throw new Exception("bug");
         }
-        var chs = columns.Chunk(3).ToArray();
-        var g1 = chs[0].Concat(chs[3]).ToArray();
-        var g2 = chs[1].Concat(chs[4]).ToArray();
-        var g3 = chs[2].Concat(chs[5]).ToArray();
-        foreach (var z1 in generate(headers[0], g1))
+        string[][] chs = columns.Chunk(3).ToArray();
+        string[] g1 = chs[0].Concat(chs[3]).ToArray();
+        string[] g2 = chs[1].Concat(chs[4]).ToArray();
+        string[] g3 = chs[2].Concat(chs[5]).ToArray();
+        foreach (Info z1 in generate(headers[0], g1))
         {
             yield return z1;
         }
-        foreach (var z2 in generate(headers[1], g2))
+        foreach (Info z2 in generate(headers[1], g2))
         {
             yield return z2;
         }
-        foreach (var z3 in generate(headers[2], g3))
+        foreach (Info z3 in generate(headers[2], g3))
         {
             yield return z3;
         }
@@ -117,15 +117,15 @@ Generate2();
     private IEnumerable<Info> generate(string header, string[] columns)
     {
         int priority = 1;
-        foreach (var x in columns.Chunk(3))
+        foreach (string[] x in columns.Chunk(3))
         {
             if (x.Length != 3)
             {
                 throw new Exception("bug");
             }
-            if (!x.All(y => string.IsNullOrWhiteSpace(y)))
+            if (!x.All(string.IsNullOrWhiteSpace))
             {
-                if (x.Any(y => string.IsNullOrWhiteSpace(y)))
+                if (x.Any(string.IsNullOrWhiteSpace))
                 {
                     throw new Exception("bug");
                 }

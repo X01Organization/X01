@@ -6,7 +6,7 @@ namespace XmlToModel
     {
         public void Parse(XmlNode node)
         {
-            var rr = new Dictionary<string, string>() {
+            Dictionary<string, string> rr = new Dictionary<string, string>() {
                {"Angebotsnummer","quotenumber"},
 {"Saison","season"},
 {"Name","Surname"},
@@ -50,25 +50,25 @@ namespace XmlToModel
 {"type","type"},
            };
 
-            var namess1 =
+            string[] namess1 =
  node.Attributes.Cast<XmlAttribute>()
                 .Select(x => x.Name).ToArray();
 
-            var names11 = string.Join(Environment.NewLine, node.Attributes.Cast<XmlAttribute>()
+            string names11 = string.Join(Environment.NewLine, node.Attributes.Cast<XmlAttribute>()
                 .Select(x => x.Name)
                 .Select(x => $"/// <summary>\r\n/// {x}\r\n///</summary>\r\n[XmlAttribute(\"{x}\")]\r\npublic string {rr[x].Substring(0, 1).ToUpperInvariant() + rr[x].Substring(1)}"
                 + "{get;set;}")
                 );
 
 
-            var namess =
+            string[] namess =
  node.ChildNodes.Cast<XmlNode>()
                 .Select(x => x.Name).ToArray();
 
 
 
             //[XmlAttribute("catalogID")]
-            var names = string.Join(Environment.NewLine, node.ChildNodes.Cast<XmlNode>()
+            string names = string.Join(Environment.NewLine, node.ChildNodes.Cast<XmlNode>()
                 .Select(x => x.Name)
                 .Select(x => $"/// <summary>\r\n/// {x}\r\n///</summary>\r\n[XmlElement(\"{x}\")]\r\npublic string {rr[x].Substring(0, 1).ToUpperInvariant() + rr[x].Substring(1)}"
                 + "{get;set;}")

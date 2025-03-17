@@ -39,7 +39,7 @@ public class ErrorController : ControllerBase
     public IActionResult Get()
     {
         // Get the details of the exception
-        var exceptionFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+        IExceptionHandlerPathFeature? exceptionFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 
         if (exceptionFeature != null)
             Log.LogError(string.Format("Exception at route: '{0}'. Exception: {1}", exceptionFeature.Path,
