@@ -6,7 +6,10 @@ public class MediaImporter
 {
     private readonly string[] _specialDirectories =
           new[] { "lost+found", "$RECYCLE.BIN", "System Volume Information", };
-    private readonly HashSet<string> _notInodes  = new();
+    private readonly HashSet<string> _notInodes = new();
+
+    private readonly byte[] _buffer1 = new byte[4 * 1024 * 1024];
+    private readonly byte[] _buffer2 = new byte[4 * 1024 * 1024];
 
     public async Task ImportAsync(Option option, CancellationToken token)
     {
@@ -151,7 +154,7 @@ public class MediaImporter
 
     private IEnumerable<FileInfo> GetAllInputImageFileInfos(FileSystemInfo[] inputFileSystemInfos, DirectoryInfo outputDirectoryInfo, List<string> extensions)
     {
-        foreach (FileSystemInfo? x in inputFileSystemInfos.DistinctBy(x=> x.FullName))
+        foreach (FileSystemInfo? x in inputFileSystemInfos.DistinctBy(x => x.FullName))
         {
             if (x is FileInfo inputFileInfo)
             {
@@ -200,7 +203,7 @@ public class MediaImporter
         List<FileInfo> uniqueFiles = new();
         foreach (FileInfo x in fileInfosWithSameSize)
         {
-            if (uniqueFiles.Select(y=> y.FullName).Contains(x.FullName))
+            if (uniqueFiles.Select(y => y.FullName).Contains(x.FullName))
             {
                 throw new Exception(x.FullName + " already exists in uniqueFiles");
             }
@@ -244,12 +247,12 @@ public class MediaImporter
 
             string outputDir = outputDirectoryInfo.FullName;
 
-            if(ShouldbeXXXX(x, dateTime))
-            { 
-                 outputDir = Path.Combine(outputDir, "XXXX");
+            if (ShouldbeXXXX(x, dateTime))
+            {
+                outputDir = Path.Combine(outputDir, "XXXX");
             }
 
-            outputDir = Path.Combine(outputDir, folder , dateTime.ToString("MM"));
+            outputDir = Path.Combine(outputDir, folder, dateTime.ToString("MM"));
 
             DirectoryInfo outputdirinfo = new(outputDir);
             if (outputdirinfo.Exists)
@@ -274,24 +277,24 @@ public class MediaImporter
         }
     }
 
-    private bool ShouldbeXXXX(FileInfo fi, DateTime minDateTime) 
+    private bool ShouldbeXXXX(FileInfo fi, DateTime minDateTime)
     {
         string nameWithoutExt = Path.GetFileNameWithoutExtension(fi.Name);
-        if(!nameWithoutExt.StartsWith("IMG_", StringComparison.OrdinalIgnoreCase))
+        if (!nameWithoutExt.StartsWith("IMG_", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
         string maybeDateTimeName = nameWithoutExt.Substring(4);
 
-        if (!DateTime.TryParseExact(maybeDateTimeName, "yyyyMMdd_HHmmssfff", CultureInfo.CurrentCulture, DateTimeStyles.None, 
+        if (!DateTime.TryParseExact(maybeDateTimeName, "yyyyMMdd_HHmmssfff", CultureInfo.CurrentCulture, DateTimeStyles.None,
             out DateTime maybeDateTime))
         {
             return false;
         }
 
-        if(maybeDateTime.Year == minDateTime.Year)
+        if (maybeDateTime.Year == minDateTime.Year)
         {
-            return  false;
+            return false;
         }
 
         return true;
@@ -336,43 +339,43 @@ public class MediaImporter
 
     private void ThrowIfSameInode(FileInfo fi1, FileInfo fi2)
     {
-        if(fi1.FullName == fi2.FullName)
+        if (fi1.FullName == fi2.FullName)
         {
             throw new UnreachableException("same file");
         }
 
-        if(fi1.Directory!.FullName == fi2.Directory!.FullName)
+        if (fi1.Directory!.FullName == fi2.Directory!.FullName)
         {
             return;
         }
 
         string inode = $"{fi1.Directory!.FullName} <> {fi2.Directory!.FullName}";
-        if(_notInodes.Contains(inode))
+        if (_notInodes.Contains(inode))
         {
             return;
         }
 
         string testFile1 = Path.Combine(fi1.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
-        if(File.Exists(testFile1))
+        if (File.Exists(testFile1))
         {
             FileInfo ss = new(testFile1);
-           ss.Delete();
+            ss.Delete();
         }
         string testFile2 = Path.Combine(fi2.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
-        if(File.Exists(testFile2))
+        if (File.Exists(testFile2))
         {
             FileInfo ss = new(testFile2);
             ss.Delete();
         }
         File.WriteAllText(testFile1, "1");
 
-        if(!File.Exists(testFile1))
-        { 
+        if (!File.Exists(testFile1))
+        {
             throw new UnreachableException($"2: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
         }
 
-        if(File.Exists(testFile2))
-        { 
+        if (File.Exists(testFile2))
+        {
             throw new UnreachableException($"3: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
         }
 
@@ -380,7 +383,7 @@ public class MediaImporter
         ss1.Delete();
 
         bool added = _notInodes.Add(inode);
-        if(!added)
+        if (!added)
         {
             throw new UnreachableException($"4: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
         }
@@ -393,24 +396,44 @@ public class MediaImporter
             return true;
         }
 
+        if (fi1.Length != fi2.Length)
+        {
+            return false;
+        }
+
         try
         {
             using (FileStream s1 = fi1.OpenRead())
             {
                 using (FileStream s2 = fi2.OpenRead())
                 {
-                    while (true)
+                    lock (_buffer1)
                     {
-                        int b1 = s1.ReadByte();
-                        int b2 = s2.ReadByte();
-                        if (b1 != b2)
+                        lock (_buffer2)
                         {
-                            return false;
-                        }
+                            int bytesRead1, bytesRead2;
+                            while (true)
+                            {
+                                bytesRead1 = s1.Read(_buffer1);
+                                bytesRead2 = s2.Read(_buffer2);
 
-                        if (-1 == b1)
-                        {
-                            return true;
+                                if (bytesRead1 != bytesRead2)
+                                {
+                                    return false;
+                                }
+
+                                if (bytesRead1 <= 0)
+                                {
+                                    return true;
+                                }
+
+                                if (!MemoryExtensions.SequenceEqual(
+                                        _buffer1.AsSpan(0, bytesRead1),
+                                        _buffer2.AsSpan(0, bytesRead2)))
+                                {
+                                    return false;
+                                }
+                            }
                         }
                     }
                 }
