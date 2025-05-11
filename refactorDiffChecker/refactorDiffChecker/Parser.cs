@@ -61,7 +61,7 @@
                                          || fileChanges[0].StartsWith("--- /dev/null"));
             System.Diagnostics.Debug.Assert(fileChanges[1].StartsWith("+++ b/")
                                          || fileChanges[1].StartsWith("+++ /dev/null"));
-            FileChanges fc = new FileChanges(new Changes(fileChanges[0].Substring(6), fileChanges[1].Substring(6)));
+            FileChanges fc = new(new Changes(fileChanges[0].Substring(6), fileChanges[1].Substring(6)));
             string[] lines = fileChanges.Skip(2).ToArray();
             string removed;
             string added;
@@ -145,7 +145,7 @@
             if (removed.TrimStart().StartsWith("//") || removed.Contains("\"") || removed.Contains("\'") ||
                 added.TrimStart().StartsWith("//") || added.Contains("\"") || added.Contains("\'"))
             {
-                Changes c = new Changes(removed, added);
+                Changes c = new(removed, added);
                 CommentChanges.Add(c);
                 return new Changes(null, null);
             }
@@ -158,7 +158,7 @@
                     !removed.Contains("table: \"tourop")
                 ))
             {
-                Changes c = new Changes(removed, added);
+                Changes c = new(removed, added);
                 CommentChanges.Add(c);
                 return new Changes(null, null);
             }
@@ -172,7 +172,7 @@
                 )
                )
             {
-                Changes c = new Changes(removed, added);
+                Changes c = new(removed, added);
                 CommentChanges.Add(c);
                 return new Changes(null, null);
             }

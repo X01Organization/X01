@@ -21,7 +21,7 @@ public static class IoCmdLineOptionExt
         FileAttributes attr = File.GetAttributes(inputFileOrDirectory);
         if (attr.HasFlag(FileAttributes.Directory))
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo(inputFileOrDirectory);
+            DirectoryInfo directoryInfo = new(inputFileOrDirectory);
             FileInfo[] infputFiles = directoryInfo.GetFiles("*", new EnumerationOptions()
             {
                 MaxRecursionDepth = 10000,

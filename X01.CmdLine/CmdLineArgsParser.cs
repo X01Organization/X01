@@ -18,8 +18,8 @@ public class CmdLineArgsParser
     {
         CmdLineArg? lastLongOrShortArg = null;
         //https://regex101.com/r/FADDVO/1
-        Regex shortArgRegex = new Regex(@"^(\-{1})([a-zA-Z0-9]+)(=(.+))?$");
-        Regex longArgRegex = new Regex(@"^(\-{2})([a-zA-Z0-9_\-]+)(=(.+))?$");
+        Regex shortArgRegex = new(@"^(\-{1})([a-zA-Z0-9]+)(=(.+))?$");
+        Regex longArgRegex = new(@"^(\-{2})([a-zA-Z0-9_\-]+)(=(.+))?$");
         foreach (string x in args)
         {
             Match longArgMatch = longArgRegex.Match(x);
@@ -27,7 +27,7 @@ public class CmdLineArgsParser
             {
                 string name = longArgMatch.Groups[2].Value;
                 string value = longArgMatch.Groups[4].Value;
-                CmdLineLongArg arg = new CmdLineLongArg(name, value);
+                CmdLineLongArg arg = new(name, value);
                 lastLongOrShortArg = arg;
                 yield return arg;
             }
@@ -38,7 +38,7 @@ public class CmdLineArgsParser
                 {
                     string name = shortArgMatch.Groups[2].Value;
                     string value = shortArgMatch.Groups[4].Value;
-                    CmdLineShortArgs arg = new CmdLineShortArgs(name, value);
+                    CmdLineShortArgs arg = new(name, value);
                     lastLongOrShortArg = arg;
                     yield return arg;
                 }

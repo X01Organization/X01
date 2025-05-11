@@ -21,7 +21,7 @@ public static class StreamExtensions
 
     public static async Task<string> ReadToEndAsync(this Stream stream)
     {
-        using (StreamReader streamReader = new StreamReader(stream, Encoding.Default, false, 1024, true))
+        using (StreamReader streamReader = new(stream, Encoding.Default, false, 1024, true))
         {
             return await streamReader.ReadToEndAsync();
         }

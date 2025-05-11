@@ -16,7 +16,7 @@ public class JsonDeserializer
         FileAttributes attr = File.GetAttributes(inputFileOrDirectory);
         if (attr.HasFlag(FileAttributes.Directory))
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo(inputFileOrDirectory);
+            DirectoryInfo directoryInfo = new(inputFileOrDirectory);
             FileInfo[] infputFiles = directoryInfo.GetFiles("*", new EnumerationOptions()
             {
                 MaxRecursionDepth = 10000,
@@ -90,7 +90,7 @@ public class JsonDeserializer
         {
             if (jsonNode is JsonObject jsonObject)
             {
-                JsonObject newJsonObject = new JsonObject();
+                JsonObject newJsonObject = new();
                 foreach ((string? key, JsonNode? value) in jsonObject)
                 {
                     JsonNode? newValue = TryDeserialize(value) ?? value?.DeepClone();
@@ -101,7 +101,7 @@ public class JsonDeserializer
 
             if (jsonNode is JsonArray jsonArray)
             {
-                JsonArray newJsonArray = new JsonArray();
+                JsonArray newJsonArray = new();
                 foreach (JsonNode? value in jsonArray)
                 {
                     JsonNode? newValue = TryDeserialize(value) ?? value?.DeepClone();
@@ -127,7 +127,7 @@ public class JsonDeserializer
                         string[] sa = Regex.Split(s, "\r\n|\r|\n");
                         if (sa.Length > 1)
                         {
-                            JsonArray newJsonArray = new JsonArray();
+                            JsonArray newJsonArray = new();
                             foreach (string si in sa)
                             {
                                 JsonNode newItemJsonNode = TryDeserialize(si) ?? JsonValue.Create(si);

@@ -19,11 +19,11 @@ List<Changes> ignorChanges = new()
 };
 string[] lines = File.ReadAllLines("C:\\Users\\zxiang\\project\\1.diff");
 
-using (FileStream fs = new FileStream("c:\\temp\\result.diff", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+using (FileStream fs = new("c:\\temp\\result.diff", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
 {
-    using (StreamWriter sw = new StreamWriter(fs))
+    using (StreamWriter sw = new(fs))
     {
-        Parser parser = new Parser();
+        Parser parser = new();
         List<List<string>> changedFiles = parser.GetChangedFiles(lines);
         foreach (List<string> fileChanges in changedFiles)
         {

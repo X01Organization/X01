@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using System.Text;
-using System.Text.Json.Serialization;
 
 namespace X01.Core.Extensions;
 
@@ -11,7 +9,7 @@ public static class TypeExtensions
     /// </summary>
     private static string? GetTypeAliases(Type type)
     {
-        Dictionary<Type, string> aliases = new Dictionary<Type, string>()
+        Dictionary<Type, string> aliases = new()
         {
             {typeof(int), "int"},
             {typeof(uint), "uint"},

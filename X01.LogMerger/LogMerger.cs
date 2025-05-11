@@ -73,7 +73,7 @@ public class LogMerger
 
     public async Task MergeAsync(string[] logFiles, CancellationToken token)
     {
-        List<LogEntry> logs1 = new List<LogEntry>();
+        List<LogEntry> logs1 = new();
         foreach (string? x in logFiles.Skip(1))
         {
             IEnumerable<LogEntry> logs = await MergeAsync(x, token);
@@ -111,7 +111,7 @@ public class LogMerger
 
     public async Task<IEnumerable<LogEntry>> MergeAsync(string logFile, CancellationToken token)
     {
-        FileInfo fi = new FileInfo(logFile);
+        FileInfo fi = new(logFile);
         await using FileStream logStream = fi.OpenRead();
         return await _logParser.ParseAsync(fi.Directory!.Name, logStream, token);
     }

@@ -16,7 +16,7 @@ public class MediaImporter
             return;
         }
 
-        DirectoryInfo outputDirectoryInfo = new DirectoryInfo(option.OutputDirectory);
+        DirectoryInfo outputDirectoryInfo = new(option.OutputDirectory);
 
         FileSystemInfo[] inputs = GetInputFileSystemInfos(option.InputFilesOrDirectories).ToArray();
         if (1 > inputs.Length)
@@ -251,7 +251,7 @@ public class MediaImporter
 
             outputDir = Path.Combine(outputDir, folder , dateTime.ToString("MM"));
 
-            DirectoryInfo outputdirinfo = new DirectoryInfo(outputDir);
+            DirectoryInfo outputdirinfo = new(outputDir);
             if (outputdirinfo.Exists)
             {
                 RemoveDuplicatedFiles(outputdirinfo.GetFiles().Where(y => y.Length == x.Length).Append(x));
@@ -263,7 +263,7 @@ public class MediaImporter
             }
 
             string newFullName = GetUniqueName(outputDir, Path.GetFileNameWithoutExtension(x.Name), x.Extension);
-            FileInfo targetFileInfo = new FileInfo(newFullName);
+            FileInfo targetFileInfo = new(newFullName);
             if (!targetFileInfo.Directory!.Exists)
             {
                 targetFileInfo.Directory.Create();
@@ -355,13 +355,13 @@ public class MediaImporter
         string testFile1 = Path.Combine(fi1.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
         if(File.Exists(testFile1))
         {
-            FileInfo ss = new FileInfo(testFile1);
+            FileInfo ss = new(testFile1);
            ss.Delete();
         }
         string testFile2 = Path.Combine(fi2.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
         if(File.Exists(testFile2))
         {
-            FileInfo ss = new FileInfo(testFile2);
+            FileInfo ss = new(testFile2);
             ss.Delete();
         }
         File.WriteAllText(testFile1, "1");
@@ -376,7 +376,7 @@ public class MediaImporter
             throw new UnreachableException($"3: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
         }
 
-        FileInfo ss1 = new FileInfo(testFile1);
+        FileInfo ss1 = new(testFile1);
         ss1.Delete();
 
         bool added = _notInodes.Add(inode);

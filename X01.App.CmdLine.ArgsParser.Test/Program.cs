@@ -51,7 +51,7 @@ int ii = 0;
 while (ii < int.MaxValue)
 {
     //var sa123 = new testStream(@"C:\workroot\data\downloads\Dev Meeting-20240202_103246-Meeting Recording.mp4", FileMode.Open, FileAccess.Read, FileShare.Read);
-    JsonContent sf1 = new JsonContent("{}");
+    JsonContent sf1 = new("{}");
     GC.Collect();
     GC.Collect(3);
     Console.WriteLine($"=>>>> {ii++}");
@@ -101,7 +101,7 @@ new Class1().Test();
 
 string timePeriodsString = " 8~10 10:30~12 13~17:25 18:10~19:05 18:00~10 ";
 
-Regex matchRegex = new Regex(@"\s*?(?<Delimiter>[\s,|;])\s*(?<StartHour>\d{1,2})(?::(?<StartMinute>\d{1,2}))?\s*~\s*(?<EndHour>\d{1,2})(?::(?<EndMinute>\d{1,2}))?\s*?");
+Regex matchRegex = new(@"\s*?(?<Delimiter>[\s,|;])\s*(?<StartHour>\d{1,2})(?::(?<StartMinute>\d{1,2}))?\s*~\s*(?<EndHour>\d{1,2})(?::(?<EndMinute>\d{1,2}))?\s*?");
 //var matchRegex = new Regex(@"\b(?<StartHour>\d{1,2})(?::(?<StartMinute>\d{1,2}))?\s*~\s*(?<EndHour>\d{1,2})(?::(?<EndMinute>\d{1,2}))?\b"); 
 MatchCollection matches = matchRegex.Matches(" " + timePeriodsString);
 
@@ -160,7 +160,7 @@ string tt = string.Join(Environment.NewLine, ttes);
 //        return left ;
 //    }).ToArray();
 
-Regex ss1 = new Regex(@"^\s*((\s(?<Hour>\d{1,2})(?::(?<Minute>\d{1,2}))?\s*~\s*(\d{1,2})(?::(\d{1,2}))?)*)\s*$");
+Regex ss1 = new(@"^\s*((\s(?<Hour>\d{1,2})(?::(?<Minute>\d{1,2}))?\s*~\s*(\d{1,2})(?::(\d{1,2}))?)*)\s*$");
 Match m = ss1.Match("   8:01~10 10:30~12 13~17:25 18:10~19:05  ");
 
 Group ss11 = m.Groups["Hour"];
