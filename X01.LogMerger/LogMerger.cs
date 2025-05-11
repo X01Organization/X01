@@ -51,6 +51,18 @@ public class LogMerger
         ") not found in contentful",
         "Hangfire.PostgreSql.PostgreSqlDistributedLockException",
         "SixLabors.ImageSharp.Formats.ImageFormatManager.ThrowInvalidDecoder",
+        "MySqlException (0x80004005): Too many connections",
+        "IOException: Unable to write data to the transport connection: Broken pipe",
+        "NpgsqlException (0x80004005): Exception while writing to stream",
+        "Model validation error:",
+        "HttpIOException: The response ended prematurely.",
+        "HttpRequestException: No route to host",
+        "HttpRequestException: Host is unreachable",
+        "(502) Bad Gateway",
+        "TimeoutException: Timeout during reading attempt",
+        "Microsoft.AspNetCore.Antiforgery.AntiforgeryValidationException: The antiforgery token could not be decrypted.",
+        "System.Net.Sockets.SocketException (11): Resource temporarily unavailable",
+        "IOException: Received an unexpected EOF or 0 bytes from the transport stream.",
     };
     private readonly LogParser.LogParser _logParser;
 

@@ -1,0 +1,28 @@
+﻿<Project>
+
+  <PropertyGroup>
+
+      <Nullable>enable</Nullable>
+
+      <!-- <TreatWarningsAsErrors>true</TreatWarningsAsErrors> -->
+
+    <WarningsAsErrors>
+
+      CA2017;  <!-- Parameter count mismatch -->
+      CA2200;  <!-- Rethrow to preserve stack details -->
+      <!-- CA2254; Template should be a static expression -->
+
+      IDE0240; <!-- Nullable directive is redundant -->
+
+      <!-- CS0693; Type parameter 'type parameter' has the same name as the type parameter from outer type 'type'                                                                                                -->
+
+      nullable;  <!-- https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/nullable-warnings -->
+    </WarningsAsErrors>
+
+  </PropertyGroup>
+
+    <!-- Local personalized needs -->
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+            Condition="Exists('$([MSBuild]::GetPathOfFileAbove(`Directory.Build.props`, `$(MSBuildThisFileDirectory)../`))')"/>
+
+</Project>
