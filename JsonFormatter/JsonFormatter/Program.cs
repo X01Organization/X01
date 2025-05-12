@@ -1,7 +1,7 @@
-﻿using CommandLine;
-using JsonFormatter;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Nodes;
+using CommandLine;
+using JsonFormatter;
 
 Parser.Default
       .ParseArguments<Options>(args)

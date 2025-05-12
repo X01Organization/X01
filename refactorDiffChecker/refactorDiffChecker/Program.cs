@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using refactorDiffChecker;
 using System.Text.RegularExpressions;
+using refactorDiffChecker;
 
 List<Changes> ignorChanges = new()
 {
