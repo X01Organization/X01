@@ -119,6 +119,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X01.App.DataGenerator", "X0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X01.App.Sln2Dot", "X01.App.Sln2Dot\X01.App.Sln2Dot.csproj", "{C123E423-AE8F-4635-9998-A2267F973DA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X01.App.RemoveCsharpUnusedMethods", "X01.App.RemoveCsharpUnusedMethods\X01.App.RemoveCsharpUnusedMethods.csproj", "{36FBE8DA-D0E1-4B5F-93F1-FABF85999B91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -281,6 +283,10 @@ Global
 		{C123E423-AE8F-4635-9998-A2267F973DA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C123E423-AE8F-4635-9998-A2267F973DA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C123E423-AE8F-4635-9998-A2267F973DA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36FBE8DA-D0E1-4B5F-93F1-FABF85999B91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36FBE8DA-D0E1-4B5F-93F1-FABF85999B91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36FBE8DA-D0E1-4B5F-93F1-FABF85999B91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36FBE8DA-D0E1-4B5F-93F1-FABF85999B91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -328,6 +334,7 @@ Global
 		{AE6C15C5-208E-407F-9CEB-0E8879BDA49F} = {2E3CB7DE-4334-4FD3-8A9E-A3643FDEB1F7}
 		{0402CDBF-E6CC-42EC-89F6-05D5F17E032B} = {0899F4EA-D16C-45CB-99B3-5B8CB78DCD18}
 		{C123E423-AE8F-4635-9998-A2267F973DA6} = {0899F4EA-D16C-45CB-99B3-5B8CB78DCD18}
+		{36FBE8DA-D0E1-4B5F-93F1-FABF85999B91} = {0899F4EA-D16C-45CB-99B3-5B8CB78DCD18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27677A85-3DD4-4ACC-84BB-2F0C652A3748}
