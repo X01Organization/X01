@@ -11,15 +11,15 @@ class Program
     static async Task Main(string[] args)
     {
         MSBuildLocator.RegisterDefaults();
-        var solutionPath = "C:\\workroot\\env\\config\\vscode\\workspace\\ja\\sln\\all.sln";
-        using var workspace = MSBuildWorkspace.Create();
-        var solution = await workspace.OpenSolutionAsync(solutionPath);
+        string solutionPath = "C:\\workroot\\env\\config\\vscode\\workspace\\ja\\sln\\all.sln";
+        using MSBuildWorkspace workspace = MSBuildWorkspace.Create();
+        Solution solution = await workspace.OpenSolutionAsync(solutionPath);
         if (workspace.Diagnostics.Any())
         {
-            foreach (var diag in workspace.Diagnostics)
+            foreach (WorkspaceDiagnostic diag in workspace.Diagnostics)
                 Console.WriteLine(diag.Message);
         }
-        foreach (var project in solution.Projects)
+        foreach (Project project in solution.Projects)
         {
             if (project.Name != "DotnetRestSvc")
             {
@@ -28,36 +28,36 @@ class Program
 
             Console.WriteLine($"Processing project: {project.Name}");
 
-            var compilation = await project.GetCompilationAsync();
+            Compilation? compilation = await project.GetCompilationAsync();
 
-            foreach (var document in project.Documents)
+            foreach (Document document in project.Documents)
             {
                 if (document.Name.EndsWith("Controller.cs", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                var root = await document.GetSyntaxRootAsync();
+                SyntaxNode? root = await document.GetSyntaxRootAsync();
                 if (root == null)
                     continue;
 
-                var model = await document.GetSemanticModelAsync();
+                SemanticModel? model = await document.GetSemanticModelAsync();
                 if (model == null)
                     continue;
 
-                var methods = root.DescendantNodes()
+                IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes()
                     .OfType<MethodDeclarationSyntax>()
                     .Where(m => m.Modifiers.Any(SyntaxKind.PublicKeyword));
 
-                var toRemove = new System.Collections.Generic.List<MethodDeclarationSyntax>();
+                List<MethodDeclarationSyntax> toRemove = new System.Collections.Generic.List<MethodDeclarationSyntax>();
 
-                foreach (var method in methods)
+                foreach (MethodDeclarationSyntax? method in methods)
                 {
-                    var symbol = model.GetDeclaredSymbol(method);
+                    IMethodSymbol? symbol = model.GetDeclaredSymbol(method);
                     if (symbol == null)
                         continue;
 
-                    var hasReference = HasReferencesAsync(solution, symbol, CancellationToken.None).GetAwaiter().GetResult();
+                    bool hasReference = HasReferencesAsync(solution, symbol, CancellationToken.None).GetAwaiter().GetResult();
                     if (!hasReference)
                     {
                         Console.WriteLine($"[UNUSED] {symbol.ToDisplayString()}");
@@ -118,7 +118,7 @@ class Program
         IMethodSymbol method,
         CancellationToken token)
     {
-        await foreach (var reference in FindReferencesAsync(solution, method, token))
+        await foreach (ReferencedSymbol reference in FindReferencesAsync(solution, method, token))
         {
             if (reference.Locations.Any())
             {
@@ -134,15 +134,15 @@ class Program
         IMethodSymbol method,
         [EnumeratorCancellation] CancellationToken token)
     {
-        var methodReferences = await SymbolFinder.FindReferencesAsync(method.OriginalDefinition, solution, token);
-        foreach (var methodReference in methodReferences)
+        IEnumerable<ReferencedSymbol> methodReferences = await SymbolFinder.FindReferencesAsync(method.OriginalDefinition, solution, token);
+        foreach (ReferencedSymbol methodReference in methodReferences)
         {
             yield return methodReference;
         }
 
-        foreach (var interfaceMethod in GetInterfaceMethods(method))
+        foreach (IMethodSymbol interfaceMethod in GetInterfaceMethods(method))
         {
-            await foreach (var interfaceMethodReference in FindReferencesAsync(solution, interfaceMethod, token))
+            await foreach (ReferencedSymbol interfaceMethodReference in FindReferencesAsync(solution, interfaceMethod, token))
             {
                 yield return interfaceMethodReference;
             }
@@ -151,10 +151,10 @@ class Program
 
     private static IEnumerable<IMethodSymbol> GetInterfaceMethods(IMethodSymbol method)
     {
-        var containingType = method.ContainingType;
-        foreach (var inheritedInterfaceType in containingType.AllInterfaces)
+        INamedTypeSymbol containingType = method.ContainingType;
+        foreach (INamedTypeSymbol inheritedInterfaceType in containingType.AllInterfaces)
         {
-            foreach (var interfaceMethod in inheritedInterfaceType.GetMembers().OfType<IMethodSymbol>().Cast<IMethodSymbol>())
+            foreach (IMethodSymbol interfaceMethod in inheritedInterfaceType.GetMembers().OfType<IMethodSymbol>().Cast<IMethodSymbol>())
             {
                 yield return interfaceMethod;
                 //var impl = containingType.FindImplementationForInterfaceMember(interfaceMethod) as IMethodSymbol;
