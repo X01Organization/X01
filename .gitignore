@@ -345,3 +345,8 @@ healthchecksdb
 *.user
 .vs
 
+out
+dist
+node_modules
+.vscode-test/
+*.vsix
