@@ -345,6 +345,7 @@ healthchecksdb
 *.user
 .vs
 
+# vscode extensions
 out
 dist
 node_modules
