@@ -14,10 +14,18 @@
   "contributes": {
     "commands": [
       {
-        "command": "dotnet-test-runner.helloWorld",
-        "title": "Hello World"
+        "command": "dotnet-test-runner.runTests",
+        "title": "Run .NET Tests"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "dotnet-test-runner.runTests",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
