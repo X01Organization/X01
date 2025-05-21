@@ -49,7 +49,7 @@ class Program
                     .OfType<MethodDeclarationSyntax>()
                     .Where(m => m.Modifiers.Any(SyntaxKind.PublicKeyword));
 
-                List<MethodDeclarationSyntax> toRemove = new System.Collections.Generic.List<MethodDeclarationSyntax>();
+                List<MethodDeclarationSyntax> toRemove = new();
 
                 foreach (MethodDeclarationSyntax? method in methods)
                 {
