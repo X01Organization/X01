@@ -14,10 +14,18 @@
   "contributes": {
     "commands": [
       {
-        "command": "command-runner.helloWorld",
-        "title": "Hello World"
+        "command": "command-runner.run",
+        "title": "X01 Run command"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "command-runner.run",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
