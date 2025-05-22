@@ -14,14 +14,14 @@
   "contributes": {
     "commands": [
       {
-        "command": "command-runner.run",
+        "command": "x01.command-runner.run",
         "title": "X01 Run command"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "command-runner.run",
+          "command": "x01.command-runner.run",
           "group": "navigation"
         }
       ]
