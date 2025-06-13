@@ -1,13 +1,15 @@
-﻿using X01.CmdLine;
+﻿using X01.App.TrimDistinct;
+using X01.CmdLine;
 using System.Linq;
 
-namespace X01.App.TrimDistinct;
+Option option = new CmdLineArgsParser().Parse<Option>(args);
 
-Option o = new CmdLineArgsParser().Parse<Option>(args);
+string output = option.Output ?? option.Input;
 
-File.WriteAllLines(o.Output!,
-               File.ReadAllLines(o.Input!)
+string[] lines = File.ReadAllLines(option.Input!)
                    .Select(line => line.Trim())
                    .Where(line => !string.IsNullOrEmpty(line))
                    .Distinct()
-                   .OrderBy(line => line));
+                   .OrderBy(line => line).ToArray();
+
+File.WriteAllLines(output, lines);
