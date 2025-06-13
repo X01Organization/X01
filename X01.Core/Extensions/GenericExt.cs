@@ -8,6 +8,6 @@ public static class GenericExt
 
     public static object? GetDefault(this Type t)
     {
-        return typeof(GenericExt).GetMethod(nameof(GetDefaultGeneric) ).MakeGenericMethod(t).Invoke(null, null);
+        return typeof(GenericExt).GetMethod(nameof(GetDefaultGeneric) )!.MakeGenericMethod(t).Invoke(null, null);
     }
 }

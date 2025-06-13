@@ -1,4 +1,6 @@
-﻿namespace X01.Core.Checkers;
+﻿using System.Reflection;
+
+namespace X01.Core.Checkers;
 
 public class ProperitiesChecker
 {
@@ -10,8 +12,8 @@ public class ProperitiesChecker
             return;
         }
 
-        System.Reflection.PropertyInfo[] objProperties = objType.GetProperties();
-        foreach (System.Reflection.PropertyInfo? x in objProperties)
+        PropertyInfo[] objProperties = objType.GetProperties();
+        foreach (PropertyInfo? x in objProperties)
         {
             if (typeof(string) == x.PropertyType)
             {
@@ -24,7 +26,7 @@ public class ProperitiesChecker
                 { 
                     continue;
                 }
-                System.Collections.IEnumerable enumerable = (System.Collections.IEnumerable) x.GetValue(obj);
+                System.Collections.IEnumerable? enumerable = (System.Collections.IEnumerable?) x.GetValue(obj);
                 if(null == enumerable)
                 {
                     throw new Exception();

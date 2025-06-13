@@ -129,7 +129,7 @@ public class CmdLineArgsParser
         {
             Type genericType = type.GetGenericArguments().Single();
             return strings.Select(x => ChangeType(x, genericType))
-                .Cast(genericType)
+                .Cast(genericType)!
                 .ToList(genericType);
         }
 

@@ -57,7 +57,7 @@ public static class TypeExtensions
     {
         if (t.IsValueType)
         {
-            return Activator.CreateInstance(t);
+            return Activator.CreateInstance(t)!;
         }
 
         if (typeof(Nullable<>).IsAssignableFrom(t))
@@ -70,7 +70,7 @@ public static class TypeExtensions
             return string.Empty;
         }
 
-        object v = Activator.CreateInstance(t);
+        object v = Activator.CreateInstance(t)!;
         SetProperties(v);
         return v;
     }
