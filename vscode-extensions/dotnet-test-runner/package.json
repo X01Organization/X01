@@ -9,7 +9,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onTask:X01"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -25,7 +27,26 @@
           "group": "navigation"
         }
       ]
-    }
+    },
+    "taskDefinitions": [
+      {
+        "type": "X01",
+        "required": [
+          "command"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
