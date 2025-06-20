@@ -138,6 +138,7 @@ public class MediaImporter
 
         foreach (IGrouping<long, FileInfo>? fileInfosWithSameSize in allInputFiles.GroupBy(x => x.Length).OrderBy(x => x.Key))
         {
+            token.ThrowIfCancellationRequested();
             try
             {
                 List<FileInfo> resultFiles = RemoveDuplicatedFiles(fileInfosWithSameSize);
