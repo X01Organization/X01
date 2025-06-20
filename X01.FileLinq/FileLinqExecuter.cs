@@ -1,26 +1,19 @@
 ﻿using System.Reflection;
 using X01.CmdLine;
 using X01.Core.Extensions;
+using X01.FileLinq.Options;
 
 namespace X01.FileLinq;
-public static class FileLinqRunner
+public static class FileLinqExecuter
 {
-    public static async Task RunAsync(string[] args, CancellationToken token)
+    public static async Task ExecuteAsync (string[] args, CancellationToken token)
     {
         FileLinqOption option = new CmdLineArgsParser().Parse<FileLinqOption>(args);
-        string? callingAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
-        //await new Reporter(option).ReportAsync(default);
-        if ("json".Equals(option.Format, StringComparison.OrdinalIgnoreCase))
-        {
-        }
-        else
-        {
 
             foreach (string action in option.Actions!)
             {
                 IAsyncEnumerable<string> lines = File.ReadLinesAsync(option.SourceFile!, token);
                 AsyncEnumerableExtension.InvokeAsyncEnumerableMethod(lines, typeof(string), action);
             }
-        }
     }
 }

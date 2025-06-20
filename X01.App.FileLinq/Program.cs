@@ -1,3 +1,3 @@
 ﻿
-await X01.FileLinq.FileLinqRunner.RunAsync(args, default);
+await X01.FileLinq.FileLinqExecuter.execute(args, default);
 

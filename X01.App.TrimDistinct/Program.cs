@@ -6,10 +6,26 @@ Option option = new CmdLineArgsParser().Parse<Option>(args);
 
 string output = option.Output ?? option.Input;
 
-string[] lines = File.ReadAllLines(option.Input!)
-                   .Select(line => line.Trim())
+IEnumerable<string> lines = File.ReadAllLines(option.Input);
+if (option.UpperCase == true)
+{
+    Console.WriteLine("Upper case option is deprecated, .");
+    lines = lines.Select(line => line.ToUpperInvariant());
+}
+if (option.LowerCase == true)
+{
+    Console.WriteLine("Lower case option is deprecated, .");
+    lines = lines.Select(line => line.ToLowerInvariant());
+}
+if (!string.IsNullOrEmpty(option.Separator))
+{
+    lines = lines.SelectMany(line => line.Split(option.Separator));
+}
+
+lines = lines.Select(x => x.Trim())
                    .Where(line => !string.IsNullOrEmpty(line))
                    .Distinct()
-                   .OrderBy(line => line).ToArray();
+                   .OrderBy(line => line)
+                   .ToArray();
 
 File.WriteAllLines(output, lines);

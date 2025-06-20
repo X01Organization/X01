@@ -109,6 +109,10 @@ public class CmdLineArgsParser
     private void SetPropertyValues<T>(T t, PropertyInfo propertyInfo, List<string?> propertyValues)
     {
         object? value = ChangeType(propertyValues, propertyInfo.PropertyType);
+        Console.WriteLine(" setting property {0} to {1} ({2}): <{3}>", 
+            propertyInfo.Name, 
+            value?.ToString() ?? "null", 
+            propertyInfo.PropertyType.Name, string.Join(", ", propertyValues));
         propertyInfo.SetValue(t, value);
     }
 
