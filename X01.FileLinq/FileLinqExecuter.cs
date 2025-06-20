@@ -4,6 +4,7 @@ using X01.Core.Extensions;
 using X01.FileLinq.Options;
 
 namespace X01.FileLinq;
+
 public static class FileLinqExecuter
 {
     public static async Task ExecuteAsync (string[] args, CancellationToken token)

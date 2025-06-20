@@ -4,6 +4,7 @@ using System.Linq;
 
 Option option = new CmdLineArgsParser().Parse<Option>(args);
 
+new List<string>().Except
 string output = option.Output ?? option.Input;
 
 IEnumerable<string> lines = File.ReadAllLines(option.Input);
