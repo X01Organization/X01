@@ -1,3 +1,3 @@
 ﻿
-X01.FileLinq.FileLinqRunner.Run(args);
+//X01.FileLinq.FileLinqRunner.Run(args);
 

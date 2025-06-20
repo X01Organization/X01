@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\X01.CmdLine\X01.CmdLine.csproj" />
+    <ProjectReference Include="..\X01.FileLinq\X01.FileLinq.csproj" />
   </ItemGroup>
 
 </Project>
