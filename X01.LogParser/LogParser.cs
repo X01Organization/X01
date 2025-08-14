@@ -6,6 +6,7 @@ namespace X01.LogParser;
 
 public class LogParser
 {
+#if false
     public async Task<IEnumerable<LogEntry> > ParseAsync(string tag, Stream logStream, CancellationToken token)
     {
         string log = await logStream.ReadToEndAsync();
@@ -24,6 +25,67 @@ Tag = tag,
                 Message = match.Groups["message"].Value.Trim()
             });
     }
+#else
+public async IAsyncEnumerable<LogEntry> ParseAsync(
+    string tag,
+    Stream logStream,
+    [EnumeratorCancellation] CancellationToken token)
+{
+    var logStartPattern = new Regex(
+        @"^(?<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{4}) \[(?<threadId>[^\]]+)\] (?<message>.*)$",
+        RegexOptions.Compiled);
+
+    using var reader = new StreamReader(logStream);
+    string? line;
+    StringBuilder entryBuffer = new();
+    string? currentTimestamp = null;
+    string? currentThreadId = null;
+
+    while ((line = await reader.ReadLineAsync()) != null)
+    {
+        token.ThrowIfCancellationRequested();
+
+        var match = logStartPattern.Match(line);
+        if (match.Success)
+        {
+            // 输出上一条日志
+            if (entryBuffer.Length > 0 && currentTimestamp != null)
+            {
+                yield return new LogEntry
+                {
+                    Tag = tag,
+                    Timestamp = currentTimestamp,
+                    ThreadId = currentThreadId ?? "",
+                    Message = entryBuffer.ToString().TrimEnd()
+                };
+                entryBuffer.Clear();
+            }
+
+            // 新日志开始
+            currentTimestamp = match.Groups["timestamp"].Value;
+            currentThreadId = match.Groups["threadId"].Value;
+            entryBuffer.AppendLine(match.Groups["message"].Value);
+        }
+        else
+        {
+            // 不是起始行 -> 属于当前日志的多行部分
+            entryBuffer.AppendLine(line);
+        }
+    }
+
+    // 处理最后一条
+    if (entryBuffer.Length > 0 && currentTimestamp != null)
+    {
+        yield return new LogEntry
+        {
+            Tag = tag,
+            Timestamp = currentTimestamp,
+            ThreadId = currentThreadId ?? "",
+            Message = entryBuffer.ToString().TrimEnd()
+        };
+    }
+}
+    #endif
     #if false
     private DateTime? GetLogTime(string? logLine)
     {
@@ -50,7 +112,7 @@ Tag = tag,
         }
         return null;
     }
-    #endif
+#endif
 }
 public class LogEntry
 {
