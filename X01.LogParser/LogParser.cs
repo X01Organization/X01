@@ -1,6 +1,8 @@
 ﻿
 using System.Text.RegularExpressions;
 using X01.Core.Extensions;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace X01.LogParser;
 

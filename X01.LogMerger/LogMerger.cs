@@ -113,6 +113,6 @@ public class LogMerger
     {
         FileInfo fi = new(logFile);
         await using FileStream logStream = fi.OpenRead();
-        return await _logParser.ParseAsync(fi.Directory!.Name, logStream, token);
+        return  await _logParser.ParseAsync(fi.Directory!.Name, logStream, token).ToArrayAsync(token);
     }
 }
