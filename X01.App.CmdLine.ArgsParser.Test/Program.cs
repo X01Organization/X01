@@ -64,7 +64,7 @@ while (ii < int.MaxValue)
 int a111 = 3;
 uint s = (uint) a111 - 4;
 
-string[] lines1 = await File.ReadAllLinesAsync("C:\\workroot\\project\\dotnetcore-tools\\Nirvana\\bin\\Debug\\net8.0\\log\\error.txt");
+string[] lines1 = await File.ReadAllLinesAsync("C:\\workroot\\project\\dotnetcore-tools\\Nirvana\\bin\\Debug\\net10.0\\log\\error.txt");
 var tttest =
 lines1.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => new { line = x, match = Regex.Match(x, @".*\((.+)\).+\((.+)\).*") }).Select(x =>
 {
