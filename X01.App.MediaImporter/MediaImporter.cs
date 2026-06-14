@@ -7,7 +7,11 @@ public class MediaImporter
 {
     private readonly string[] _specialDirectories =
           new[] { "lost+found", "$RECYCLE.BIN", "System Volume Information", };
-    private readonly HashSet<string> _notInodes = new();
+    // Use OS-appropriate comparer for path keys (Windows is case-insensitive).
+    private readonly HashSet<string> _notInodes = new(
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal);
 
     private readonly byte[] _buffer1 = new byte[10 * 1024 * 1024];
     private readonly byte[] _buffer2 = new byte[10 * 1024 * 1024];
@@ -70,21 +74,23 @@ public class MediaImporter
         }
     }
 
-    private IEnumerable<DirectoryInfo> TryEnumerateDirectoriesInTopDirectory(DirectoryInfo di)
+    private DirectoryInfo[] TryEnumerateDirectoriesInTopDirectory(DirectoryInfo di)
     {
         try
         {
-            return di.EnumerateDirectories("*", SearchOption.TopDirectoryOnly);
+            // Materialize the enumeration here so exceptions caused by IO
+            // during enumeration are caught by this try/catch.
+            return di.EnumerateDirectories("*", SearchOption.TopDirectoryOnly).ToArray();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error by TryEnumerateDirectoriesInTopDirectory({di.FullName}):");
             Console.WriteLine(ex.ToString());
-            return Enumerable.Empty<DirectoryInfo>();
+            return Array.Empty<DirectoryInfo>();
         }
     }
 
-    private IEnumerable<FileInfo> TryEnumerateFilesInTopDirectory(DirectoryInfo di)
+    private FileInfo[] TryEnumerateFilesInTopDirectory(DirectoryInfo di)
     {
         try
         {
@@ -96,7 +102,7 @@ public class MediaImporter
         {
             Console.WriteLine($"Error by TryEnumerateFilesInTopDirectory({di.FullName}):");
             Console.WriteLine(ex.ToString());
-            return Enumerable.Empty<FileInfo>();
+            return Array.Empty<FileInfo>();
         }
     }
 
@@ -133,7 +139,7 @@ public class MediaImporter
         }
     }
 
-    private async Task ImportAsync(FileSystemInfo[] inputFileSystemInfos, DirectoryInfo outputDirectoryInfo, List<string> extensions, CancellationToken token)
+    private async Task ImportAsync(FileSystemInfo[] inputFileSystemInfos, DirectoryInfo outputDirectoryInfo, HashSet<string> extensions, CancellationToken token)
     {
         IEnumerable<FileInfo> allInputFiles = GetAllInputImageFileInfos(inputFileSystemInfos, outputDirectoryInfo, extensions);
 
@@ -154,7 +160,7 @@ public class MediaImporter
         }
     }
 
-    private IEnumerable<FileInfo> GetAllInputImageFileInfos(FileSystemInfo[] inputFileSystemInfos, DirectoryInfo outputDirectoryInfo, List<string> extensions)
+    private IEnumerable<FileInfo> GetAllInputImageFileInfos(FileSystemInfo[] inputFileSystemInfos, DirectoryInfo outputDirectoryInfo, HashSet<string> extensions)
     {
         foreach (FileSystemInfo? x in inputFileSystemInfos.DistinctBy(x => x.FullName))
         {
@@ -200,15 +206,15 @@ public class MediaImporter
         return inputFull.StartsWith(outputFull, cmp);
     }
 
-    private bool IsGoodSizeImage(FileInfo fileInfo, List<string> extensions)
+    private bool IsGoodSizeImage(FileInfo fileInfo, HashSet<string> extensions)
     {
-        if ((1024 / 2) * 1024 > fileInfo.Length)
+        const long MinBytes = 512 * 1024; // 0.5 MB
+        if (fileInfo.Length < MinBytes)
         {
-            // > 0.5MB
             return false;
         }
 
-        if (0 < extensions.Count && !extensions.Contains(fileInfo.Extension.ToLowerInvariant()))
+        if (extensions.Count > 0 && !extensions.Contains(fileInfo.Extension.ToLowerInvariant()))
         {
             return false;
         }
@@ -323,7 +329,7 @@ public class MediaImporter
         int i = 0;
         while (i < int.MaxValue)
         {
-            string newName = 0 == i ? name : name + "_" + string.Format("{0,5:0000000}", i);
+            string newName = 0 == i ? name : name + "_" + i.ToString("D7");
             string newFullName = Path.Combine(dir, newName + ext);
             if (!File.Exists(newFullName))
             {
