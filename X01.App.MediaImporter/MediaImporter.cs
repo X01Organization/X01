@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace X01.App.MediaImporter;
 public class MediaImporter
@@ -180,7 +181,23 @@ public class MediaImporter
 
     private bool IsOutputDirectory(FileSystemInfo inputFileSystemInfo, DirectoryInfo outputDirectoryInfo)
     {
-        return inputFileSystemInfo.FullName.StartsWith(outputDirectoryInfo.FullName);
+        // Normalize both paths and ensure we compare directory-prefixes safely.
+        // Use GetFullPath to resolve any relative segments. Append a directory
+        // separator after trimming so comparisons like "/path/out" vs
+        // "/path/out2" don't falsely match. Using Path.GetFullPath also keeps
+        // file paths intact — a file inside the output folder will still start
+        // with the normalized output folder path.
+        string inputFull = Path.GetFullPath(inputFileSystemInfo.FullName);
+        string outputFull = Path.GetFullPath(outputDirectoryInfo.FullName);
+
+        inputFull = inputFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        outputFull = outputFull.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+        StringComparison cmp = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return inputFull.StartsWith(outputFull, cmp);
     }
 
     private bool IsGoodSizeImage(FileInfo fileInfo, List<string> extensions)
