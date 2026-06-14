@@ -51,7 +51,13 @@ public class MediaImporter
         Console.WriteLine("Output directory:");
         Console.WriteLine("\t" + outputDirectoryInfo.FullName);
 
-        await ImportAsync(inputs, outputDirectoryInfo, option.Extensions ?? new List<string>(), token);
+        // Normalize extensions once to a HashSet of lowercase values (including leading dot)
+        List<string> extList = option.Extensions ?? new List<string>();
+        HashSet<string> extSet = new(extList
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.StartsWith('.') ? x.ToLowerInvariant() : ("." + x.ToLowerInvariant())));
+
+        await ImportAsync(inputs, outputDirectoryInfo, extSet, token);
     }
 
     private IEnumerable<FileSystemInfo> GetInputFileSystemInfos(IEnumerable<string>? inputFilesOrDirectories)
@@ -94,9 +100,23 @@ public class MediaImporter
     {
         try
         {
-            return di.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
-                     .Where(x => x.Length > -1)
-                     .ToArray();
+            var list = new List<FileInfo>();
+            foreach (FileInfo f in di.EnumerateFiles("*", SearchOption.TopDirectoryOnly))
+            {
+                try
+                {
+                    // Force access to Length so IO/permission errors are caught here.
+                    _ = f.Length;
+                    list.Add(f);
+                }
+                catch (Exception exFile)
+                {
+                    Console.WriteLine($"Warning: cannot access file {f.FullName}: {exFile.Message}");
+                    // skip this file and continue with others
+                }
+            }
+
+            return list.ToArray();
         }
         catch (Exception ex)
         {
