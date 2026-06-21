@@ -1,3 +1,15 @@
+using System;
+using System.Buffers;
+using System.IO;
+using System.Collections.Generic;
+
+namespace X01.App.MediaImporter;
+/// <summary>
+/// 用于按内容比较文件的实例比较器。
+/// 提供单个实例 FileContentComparer.Instance，用于替代静态方法调用。
+/// </summary>
+public sealed class FileContentComparer : IEqualityComparer<FileInfo>
+{
 
     private bool IsSame(FileInfo fi1, FileInfo fi2)
     {
@@ -56,3 +68,4 @@
             return false;
         }
     }
+}
