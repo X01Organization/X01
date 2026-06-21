@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Launch X01.App.MediaImporter (console)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build: X01.App.MediaImporter",
+      "program": "${workspaceFolder}/X01.App.MediaImporter/bin/Debug/net10.0/X01.App.MediaImporter.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/X01.App.MediaImporter",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Attach to Process",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    }
+  ]
+}

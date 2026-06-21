@@ -138,8 +138,20 @@ public class MediaImporter
             yield break;
         }
 
+        if (LinkHelpers.IsLink(di.FullName))
+        {
+            Console.WriteLine($"Skip link directory \"{di.FullName}\"");
+            yield break;
+        }
+
         foreach (FileInfo x in TryEnumerateFilesInTopDirectory(di))
         {
+            if (LinkHelpers.IsLink(di.FullName))
+            {
+                Console.WriteLine($"Skip link directory \"{di.FullName}\"");
+                continue;
+            }
+
             yield return x;
         }
 
@@ -152,6 +164,12 @@ public class MediaImporter
 
             foreach (FileInfo y in TryEnumerateFilesInAllDirectories(x, outputDirectoryInfo))
             {
+                if (LinkHelpers.IsLink(y.FullName))
+                {
+                    Console.WriteLine($"Skip link file \"{y.FullName}\"");
+                    continue;
+                }
+
                 yield return y;
             }
         }
