@@ -13,7 +13,6 @@ public sealed class FileContentComparer
     private readonly byte[] _buffer1 = new byte[10 * 1024 * 1024];
     private readonly byte[] _buffer2 = new byte[10 * 1024 * 1024];
 
-
     public bool MatchesByContent(FileInfo fi1, FileInfo fi2)
     {
         if (fi1.FullName == fi2.FullName)
@@ -26,21 +25,22 @@ public sealed class FileContentComparer
             return false;
         }
 
+        return MatchesByContent(fi1, fi2, _buffer1, _buffer2);
+    }
+
+    private bool MatchesByContent(FileInfo fi1, FileInfo fi2, byte[] buffer1, byte[] buffer2)
+    {
         try
         {
             using (FileStream s1 = fi1.OpenRead())
             {
                 using (FileStream s2 = fi2.OpenRead())
                 {
-                    lock (_buffer1)
-                    {
-                        lock (_buffer2)
-                        {
                             int bytesRead1, bytesRead2;
                             while (true)
                             {
-                                bytesRead1 = s1.Read(_buffer1);
-                                bytesRead2 = s2.Read(_buffer2);
+                                bytesRead1 = s1.Read(buffer1);
+                                bytesRead2 = s2.Read(buffer2);
 
                                 if (bytesRead1 != bytesRead2)
                                 {
@@ -53,14 +53,12 @@ public sealed class FileContentComparer
                                 }
 
                                 if (!MemoryExtensions.SequenceEqual(
-                                        _buffer1.AsSpan(0, bytesRead1),
-                                        _buffer2.AsSpan(0, bytesRead2)))
+                                        buffer1.AsSpan(0, bytesRead1),
+                                        buffer2.AsSpan(0, bytesRead2)))
                                 {
                                     return false;
                                 }
                             }
-                        }
-                    }
                 }
             }
         }
