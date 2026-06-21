@@ -8,10 +8,13 @@ namespace X01.App.MediaImporter;
 /// 用于按内容比较文件的实例比较器。
 /// 提供单个实例 FileContentComparer.Instance，用于替代静态方法调用。
 /// </summary>
-public sealed class FileContentComparer : IEqualityComparer<FileInfo>
+public sealed class FileContentComparer 
 {
+    private readonly byte[] _buffer1 = new byte[10 * 1024 * 1024];
+    private readonly byte[] _buffer2 = new byte[10 * 1024 * 1024];
 
-    private bool IsSame(FileInfo fi1, FileInfo fi2)
+
+    public bool IsSame(FileInfo fi1, FileInfo fi2)
     {
         if (fi1.FullName == fi2.FullName)
         {

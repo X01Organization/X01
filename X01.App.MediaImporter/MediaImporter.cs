@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 namespace X01.App.MediaImporter;
 public class MediaImporter
 {
+    private readonly FileContentComparer _fileContentComparer = new();
     private readonly string[] _specialDirectories =
           new[] { "lost+found", "$RECYCLE.BIN", "System Volume Information", };
     // Use OS-appropriate comparer for path keys (Windows is case-insensitive).
@@ -12,10 +13,6 @@ public class MediaImporter
         RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             ? StringComparer.OrdinalIgnoreCase
             : StringComparer.Ordinal);
-
-    private readonly byte[] _buffer1 = new byte[10 * 1024 * 1024];
-    private readonly byte[] _buffer2 = new byte[10 * 1024 * 1024];
-
     public async Task ImportAsync(Option option, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(option.OutputDirectory))
@@ -252,7 +249,8 @@ public class MediaImporter
                 throw new Exception(x.FullName + " already exists in uniqueFiles");
             }
 
-            FileInfo? existFile = uniqueFiles.FirstOrDefault(y => IsSame(x, y));
+            FileInfo? existFile = uniqueFiles.FirstOrDefault(
+                y => _fileContentComparer.IsSame(x, y));
 
             if (null == existFile)
             {
