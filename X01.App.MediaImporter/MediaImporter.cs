@@ -291,7 +291,7 @@ public class MediaImporter
 
             string outputDir = outputDirectoryInfo.FullName;
 
-            if (ShouldBeInXXXXFolder(x, dateTime))
+            if (ShouldbeXXXX(x, dateTime))
             {
                 outputDir = Path.Combine(outputDir, "XXXX");
             }
@@ -321,7 +321,7 @@ public class MediaImporter
         }
     }
 
-    private bool ShouldBeInXXXXFolder(FileInfo fi, DateTime minDateTime)
+    private bool ShouldbeXXXX(FileInfo fi, DateTime minDateTime)
     {
         string nameWithoutExt = Path.GetFileNameWithoutExtension(fi.Name);
         if (!nameWithoutExt.StartsWith("IMG_", StringComparison.OrdinalIgnoreCase))
@@ -433,61 +433,4 @@ public class MediaImporter
         }
     }
 
-    private bool IsSame(FileInfo fi1, FileInfo fi2)
-    {
-        if (fi1.FullName == fi2.FullName)
-        {
-            return true;
-        }
-
-        if (fi1.Length != fi2.Length)
-        {
-            return false;
-        }
-
-        try
-        {
-            using (FileStream s1 = fi1.OpenRead())
-            {
-                using (FileStream s2 = fi2.OpenRead())
-                {
-                    lock (_buffer1)
-                    {
-                        lock (_buffer2)
-                        {
-                            int bytesRead1, bytesRead2;
-                            while (true)
-                            {
-                                bytesRead1 = s1.Read(_buffer1);
-                                bytesRead2 = s2.Read(_buffer2);
-
-                                if (bytesRead1 != bytesRead2)
-                                {
-                                    return false;
-                                }
-
-                                if (bytesRead1 <= 0)
-                                {
-                                    return true;
-                                }
-
-                                if (!MemoryExtensions.SequenceEqual(
-                                        _buffer1.AsSpan(0, bytesRead1),
-                                        _buffer2.AsSpan(0, bytesRead2)))
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error by comparing:");
-            Console.WriteLine(ex.ToString());
-            return false;
-        }
-    }
 }
