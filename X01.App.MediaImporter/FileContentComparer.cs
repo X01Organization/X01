@@ -8,7 +8,7 @@ namespace X01.App.MediaImporter;
 /// 用于按内容比较文件的实例比较器。
 /// 提供单个实例 FileContentComparer.Instance，用于替代静态方法调用。
 /// </summary>
-public sealed class FileContentComparer 
+public sealed class FileContentComparer
 {
     private readonly byte[] _buffer1 = new byte[10 * 1024 * 1024];
     private readonly byte[] _buffer2 = new byte[10 * 1024 * 1024];
@@ -36,29 +36,29 @@ public sealed class FileContentComparer
             {
                 using (FileStream s2 = fi2.OpenRead())
                 {
-                            int bytesRead1, bytesRead2;
-                            while (true)
-                            {
-                                bytesRead1 = s1.Read(buffer1);
-                                bytesRead2 = s2.Read(buffer2);
+                    int bytesRead1, bytesRead2;
+                    while (true)
+                    {
+                        bytesRead1 = s1.Read(buffer1);
+                        bytesRead2 = s2.Read(buffer2);
 
-                                if (bytesRead1 != bytesRead2)
-                                {
-                                    return false;
-                                }
+                        if (bytesRead1 != bytesRead2)
+                        {
+                            return false;
+                        }
 
-                                if (bytesRead1 <= 0)
-                                {
-                                    return true;
-                                }
+                        if (bytesRead1 <= 0)
+                        {
+                            return true;
+                        }
 
-                                if (!MemoryExtensions.SequenceEqual(
-                                        buffer1.AsSpan(0, bytesRead1),
-                                        buffer2.AsSpan(0, bytesRead2)))
-                                {
-                                    return false;
-                                }
-                            }
+                        if (!MemoryExtensions.SequenceEqual(
+                                buffer1.AsSpan(0, bytesRead1),
+                                buffer2.AsSpan(0, bytesRead2)))
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
         }
