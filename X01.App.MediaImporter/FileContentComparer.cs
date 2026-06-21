@@ -14,7 +14,7 @@ public sealed class FileContentComparer
     private readonly byte[] _buffer2 = new byte[10 * 1024 * 1024];
 
 
-    public bool IsSame(FileInfo fi1, FileInfo fi2)
+    public bool MatchesByContent(FileInfo fi1, FileInfo fi2)
     {
         if (fi1.FullName == fi2.FullName)
         {

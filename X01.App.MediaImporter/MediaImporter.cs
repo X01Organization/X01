@@ -250,7 +250,7 @@ public class MediaImporter
             }
 
             FileInfo? existFile = uniqueFiles.FirstOrDefault(
-                y => _fileContentComparer.IsSame(x, y));
+                y => _fileContentComparer.MatchesByContent(x, y));
 
             if (null == existFile)
             {
