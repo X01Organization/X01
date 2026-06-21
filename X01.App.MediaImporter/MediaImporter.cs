@@ -291,7 +291,7 @@ public class MediaImporter
 
             string outputDir = outputDirectoryInfo.FullName;
 
-            if (ShouldbeXXXX(x, dateTime))
+            if (ShouldBeInXXXXFolder(x, dateTime))
             {
                 outputDir = Path.Combine(outputDir, "XXXX");
             }
@@ -321,7 +321,7 @@ public class MediaImporter
         }
     }
 
-    private bool ShouldbeXXXX(FileInfo fi, DateTime minDateTime)
+    private bool ShouldBeInXXXXFolder(FileInfo fi, DateTime minDateTime)
     {
         string nameWithoutExt = Path.GetFileNameWithoutExtension(fi.Name);
         if (!nameWithoutExt.StartsWith("IMG_", StringComparison.OrdinalIgnoreCase))
