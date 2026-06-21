@@ -38,7 +38,16 @@ public sealed class FileContentComparer
                 byte[] buffer2 = pool.Rent(BufferSize);
                 try
                 {
-                    return MatchesByContent(fi1, fi2, buffer1, buffer2);
+                    try
+                    {
+                        return MatchesByContent(fi1, fi2, buffer1, buffer2);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error by comparing:");
+                        Console.WriteLine(ex.ToString());
+                        return false;
+                    }
                 }
                 finally
                 {
@@ -58,43 +67,34 @@ public sealed class FileContentComparer
 
     private bool MatchesByContent(FileInfo fi1, FileInfo fi2, byte[] buffer1, byte[] buffer2)
     {
-        try
+        using (FileStream s1 = fi1.OpenRead())
         {
-            using (FileStream s1 = fi1.OpenRead())
+            using (FileStream s2 = fi2.OpenRead())
             {
-                using (FileStream s2 = fi2.OpenRead())
+                int bytesRead1, bytesRead2;
+                while (true)
                 {
-                    int bytesRead1, bytesRead2;
-                    while (true)
+                    bytesRead1 = s1.Read(buffer1);
+                    bytesRead2 = s2.Read(buffer2);
+
+                    if (bytesRead1 != bytesRead2)
                     {
-                        bytesRead1 = s1.Read(buffer1);
-                        bytesRead2 = s2.Read(buffer2);
+                        return false;
+                    }
 
-                        if (bytesRead1 != bytesRead2)
-                        {
-                            return false;
-                        }
+                    if (bytesRead1 <= 0)
+                    {
+                        return true;
+                    }
 
-                        if (bytesRead1 <= 0)
-                        {
-                            return true;
-                        }
-
-                        if (!MemoryExtensions.SequenceEqual(
-                                buffer1.AsSpan(0, bytesRead1),
-                                buffer2.AsSpan(0, bytesRead2)))
-                        {
-                            return false;
-                        }
+                    if (!MemoryExtensions.SequenceEqual(
+                            buffer1.AsSpan(0, bytesRead1),
+                            buffer2.AsSpan(0, bytesRead2)))
+                    {
+                        return false;
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error by comparing:");
-            Console.WriteLine(ex.ToString());
-            return false;
         }
     }
 }
