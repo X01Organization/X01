@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace X01.App.MediaImporter;
 /// <summary>
@@ -10,8 +11,9 @@ namespace X01.App.MediaImporter;
 /// </summary>
 public sealed class FileContentComparer
 {
-    private readonly byte[] _buffer1 = new byte[10 * 1024 * 1024];
-    private readonly byte[] _buffer2 = new byte[10 * 1024 * 1024];
+    // Limit concurrent callers to MatchesByContent to 3 threads.
+    private static readonly SemaphoreSlim _concurrencyLimiter = new(3);
+    private const int BufferSize = 10 * 1024 * 1024; // 10 MB
 
     public bool MatchesByContent(FileInfo fi1, FileInfo fi2)
     {
@@ -25,7 +27,33 @@ public sealed class FileContentComparer
             return false;
         }
 
-        return MatchesByContent(fi1, fi2, _buffer1, _buffer2);
+        // Limit concurrent callers
+        _concurrencyLimiter.Wait();
+        try
+        {
+            var pool = ArrayPool<byte>.Shared;
+            byte[] buffer1 = pool.Rent(BufferSize);
+            try
+            {
+                byte[] buffer2 = pool.Rent(BufferSize);
+                try
+                {
+                    return MatchesByContent(fi1, fi2, buffer1, buffer2);
+                }
+                finally
+                {
+                    pool.Return(buffer2);
+                }
+            }
+            finally
+            {
+                pool.Return(buffer1);
+            }
+        }
+        finally
+        {
+            _concurrencyLimiter.Release();
+        }
     }
 
     private bool MatchesByContent(FileInfo fi1, FileInfo fi2, byte[] buffer1, byte[] buffer2)
