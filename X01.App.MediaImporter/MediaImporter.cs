@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace X01.App.MediaImporter;
+
 public class MediaImporter
 {
     private readonly FileContentComparer _fileContentComparer = new();
@@ -397,6 +398,17 @@ public class MediaImporter
             return;
         }
 
+        ThrowIfSameInode1(fi1, fi2);
+
+        bool added = _notInodes.Add(inode);
+        if (!added)
+        {
+            throw new UnreachableException($"4: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
+        }
+    }
+
+    private void ThrowIfSameInode1(FileInfo fi1, FileInfo fi2)
+    {
         string testFile1 = Path.Combine(fi1.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
         if (File.Exists(testFile1))
         {
@@ -423,12 +435,5 @@ public class MediaImporter
 
         FileInfo ss1 = new(testFile1);
         ss1.Delete();
-
-        bool added = _notInodes.Add(inode);
-        if (!added)
-        {
-            throw new UnreachableException($"4: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
-        }
     }
-
 }
