@@ -93,7 +93,7 @@ public class MediaImporter
         }
     }
 
-    private List<FileInfo>TryEnumerateFilesInTopDirectory(DirectoryInfo di)
+    private List<FileInfo> TryEnumerateFilesInTopDirectory(DirectoryInfo di)
     {
         List<FileInfo> list = new List<FileInfo>();
         try
@@ -108,7 +108,7 @@ public class MediaImporter
                         continue;
                     }
 
-                    if( f.Length < 1)
+                    if (f.Length < 1)
                     {
                         continue;
                     }
@@ -266,8 +266,7 @@ public class MediaImporter
                 throw new Exception(x.FullName + " already exists in uniqueFiles");
             }
 
-            FileInfo? existFile = uniqueFiles.FirstOrDefault(
-                y => _fileContentComparer.MatchesByContent(x, y));
+            FileInfo? existFile = uniqueFiles.FirstOrDefault(y => IsSameContentFileButNotSameFile(x, y));
 
             if (null == existFile)
             {
@@ -275,8 +274,6 @@ public class MediaImporter
             }
             else
             {
-                ThrowIfSameFile(existFile, x);
-
                 DateTime minDatetime = GetFileMinDateTime(existFile, x);
                 if (minDatetime < existFile.LastWriteTime)
                 {
@@ -289,6 +286,27 @@ public class MediaImporter
         }
 
         return uniqueFiles;
+    }
+
+    private bool IsSameContentFileButNotSameFile(FileInfo f1, FileInfo f2)
+    {
+        try
+        {
+            if (UnixLinkHelpers.IsSameFile(f1.FullName, f2.FullName))
+            {
+                return false;
+            }
+
+            return _fileContentComparer.MatchesByContent(f1, f2);
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Warning: cannot access file {f1.FullName} or {f2.FullName}: {ex.Message}");
+            // skip this file and continue with others
+            Console.WriteLine(ex.ToString());
+            return false;
+        }
     }
 
     private void MoveToOutputDirectory(IEnumerable<FileInfo> results, DirectoryInfo outputDirectoryInfo)
@@ -394,14 +412,6 @@ public class MediaImporter
             DateTime.Today, }
         .Where(x => x != DateTime.MinValue)
         .Min();
-    }
-
-    private void ThrowIfSameFile(FileInfo fi1, FileInfo fi2)
-    {
-        if (UnixLinkHelpers.IsSameFile(fi1.FullName, fi2.FullName))
-        {
-            throw new UnreachableException("same files: " + fi1.FullName + " and " + fi2.FullName);
-        }
     }
 
     private bool IsMountPoint(string path)
