@@ -7,13 +7,12 @@ namespace X01.App.MediaImporter;
 public class MediaImporter
 {
     private readonly FileContentComparer _fileContentComparer = new();
+
+    private readonly string[] _mountPoints = MountChecker.GetMountPoints();
+
     private readonly string[] _specialDirectories =
           new[] { "lost+found", "$RECYCLE.BIN", "System Volume Information", };
-    // Use OS-appropriate comparer for path keys (Windows is case-insensitive).
-    private readonly HashSet<string> _notInodes = new(
-        RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? StringComparer.OrdinalIgnoreCase
-            : StringComparer.Ordinal);
+
     public async Task ImportAsync(Option option, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(option.OutputDirectory))
@@ -132,21 +131,33 @@ public class MediaImporter
             yield break;
         }
 
+        if (IsOutputDirectory(di, outputDirectoryInfo))
+        {
+            Console.WriteLine($"Skip output directory \"{di.FullName}\"");
+            yield break;
+        }
+
         if (_specialDirectories.Contains(di.Name))
         {
             Console.WriteLine($"Skip special directory \"{di.FullName}\"");
             yield break;
         }
 
-        if (LinkHelpers.IsLink(di.FullName))
+        if (LinkHelpers.IsSymbolicLink(di.FullName))
         {
             Console.WriteLine($"Skip link directory \"{di.FullName}\"");
             yield break;
         }
 
+        if (IsMountPoint(di.FullName))
+        {
+            Console.WriteLine($"Skip mount point directory \"{di.FullName}\"");
+            yield break;
+        }
+
         foreach (FileInfo x in TryEnumerateFilesInTopDirectory(di))
         {
-            if (LinkHelpers.IsLink(di.FullName))
+            if (LinkHelpers.IsSymbolicLink(di.FullName))
             {
                 Console.WriteLine($"Skip link directory \"{di.FullName}\"");
                 continue;
@@ -157,19 +168,8 @@ public class MediaImporter
 
         foreach (DirectoryInfo x in TryEnumerateDirectoriesInTopDirectory(di))
         {
-            if (IsOutputDirectory(x, outputDirectoryInfo))
-            {
-                continue;
-            }
-
             foreach (FileInfo y in TryEnumerateFilesInAllDirectories(x, outputDirectoryInfo))
             {
-                if (LinkHelpers.IsLink(y.FullName))
-                {
-                    Console.WriteLine($"Skip link file \"{y.FullName}\"");
-                    continue;
-                }
-
                 yield return y;
             }
         }
@@ -223,12 +223,6 @@ public class MediaImporter
 
     private bool IsOutputDirectory(FileSystemInfo inputFileSystemInfo, DirectoryInfo outputDirectoryInfo)
     {
-        // Normalize both paths and ensure we compare directory-prefixes safely.
-        // Use GetFullPath to resolve any relative segments. Append a directory
-        // separator after trimming so comparisons like "/path/out" vs
-        // "/path/out2" don't falsely match. Using Path.GetFullPath also keeps
-        // file paths intact — a file inside the output folder will still start
-        // with the normalized output folder path.
         string inputFull = Path.GetFullPath(inputFileSystemInfo.FullName);
         string outputFull = Path.GetFullPath(outputDirectoryInfo.FullName);
 
@@ -277,7 +271,7 @@ public class MediaImporter
             }
             else
             {
-                ThrowIfSameInode(existFile, x);
+                ThrowIfSameFile(existFile, x);
 
                 DateTime minDatetime = GetFileMinDateTime(existFile, x);
                 if (minDatetime < existFile.LastWriteTime)
@@ -398,60 +392,21 @@ public class MediaImporter
         .Min();
     }
 
-    private void ThrowIfSameInode(FileInfo fi1, FileInfo fi2)
+    private void ThrowIfSameFile(FileInfo fi1, FileInfo fi2)
     {
-        if (fi1.FullName == fi2.FullName)
+        if (UnixLinkHelpers.IsSameFile(fi1.FullName, fi2.FullName))
         {
-            throw new UnreachableException("same file");
-        }
-
-        if (fi1.Directory!.FullName == fi2.Directory!.FullName)
-        {
-            return;
-        }
-
-        string inode = $"{fi1.Directory!.FullName} <> {fi2.Directory!.FullName}";
-        if (_notInodes.Contains(inode))
-        {
-            return;
-        }
-
-        ThrowIfSameInode1(fi1, fi2);
-
-        bool added = _notInodes.Add(inode);
-        if (!added)
-        {
-            throw new UnreachableException($"4: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
+            throw new UnreachableException("same files: " + fi1.FullName + " and " + fi2.FullName);
         }
     }
 
-    private void ThrowIfSameInode1(FileInfo fi1, FileInfo fi2)
+    private bool IsMountPoint(string path)
     {
-        string testFile1 = Path.Combine(fi1.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
-        if (File.Exists(testFile1))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            FileInfo ss = new(testFile1);
-            ss.Delete();
-        }
-        string testFile2 = Path.Combine(fi2.Directory!.FullName, "dummy.zhichaoxiang.test.inode.file");
-        if (File.Exists(testFile2))
-        {
-            FileInfo ss = new(testFile2);
-            ss.Delete();
-        }
-        File.WriteAllText(testFile1, "1");
-
-        if (!File.Exists(testFile1))
-        {
-            throw new UnreachableException($"2: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
+            return _mountPoints.Contains(path, StringComparer.OrdinalIgnoreCase);
         }
 
-        if (File.Exists(testFile2))
-        {
-            throw new UnreachableException($"3: same inode: {fi1.Directory!.FullName}  and {fi2.Directory!.FullName}");
-        }
-
-        FileInfo ss1 = new(testFile1);
-        ss1.Delete();
+        throw new PlatformNotSupportedException("Mount point detection is only supported on Linux.");
     }
 }
