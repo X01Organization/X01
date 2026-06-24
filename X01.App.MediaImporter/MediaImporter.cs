@@ -93,34 +93,44 @@ public class MediaImporter
         }
     }
 
-    private FileInfo[] TryEnumerateFilesInTopDirectory(DirectoryInfo di)
+    private List<FileInfo>TryEnumerateFilesInTopDirectory(DirectoryInfo di)
     {
+        List<FileInfo> list = new List<FileInfo>();
         try
         {
-            var list = new List<FileInfo>();
             foreach (FileInfo f in di.EnumerateFiles("*", SearchOption.TopDirectoryOnly))
             {
                 try
                 {
-                    // Force access to Length so IO/permission errors are caught here.
-                    _ = f.Length;
+                    if (LinkHelpers.IsSymbolicLink(f.FullName))
+                    {
+                        Console.WriteLine($"Skip link file \"{f.FullName}\"");
+                        continue;
+                    }
+
+                    if( f.Length < 1)
+                    {
+                        continue;
+                    }
+
                     list.Add(f);
                 }
                 catch (Exception exFile)
                 {
                     Console.WriteLine($"Warning: cannot access file {f.FullName}: {exFile.Message}");
                     // skip this file and continue with others
+                    Console.WriteLine(exFile.ToString());
                 }
             }
 
-            return list.ToArray();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error by TryEnumerateFilesInTopDirectory({di.FullName}):");
             Console.WriteLine(ex.ToString());
-            return Array.Empty<FileInfo>();
         }
+
+        return list;
     }
 
     private IEnumerable<FileInfo> TryEnumerateFilesInAllDirectories(DirectoryInfo di, DirectoryInfo outputDirectoryInfo)
@@ -137,7 +147,7 @@ public class MediaImporter
             yield break;
         }
 
-        if (_specialDirectories.Contains(di.Name))
+        if (IsSpecialDirectory(di))
         {
             Console.WriteLine($"Skip special directory \"{di.FullName}\"");
             yield break;
@@ -157,12 +167,6 @@ public class MediaImporter
 
         foreach (FileInfo x in TryEnumerateFilesInTopDirectory(di))
         {
-            if (LinkHelpers.IsSymbolicLink(di.FullName))
-            {
-                Console.WriteLine($"Skip link directory \"{di.FullName}\"");
-                continue;
-            }
-
             yield return x;
         }
 
@@ -402,11 +406,16 @@ public class MediaImporter
 
     private bool IsMountPoint(string path)
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        return _mountPoints.Contains(path, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private bool IsSpecialDirectory(DirectoryInfo di)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            return _mountPoints.Contains(path, StringComparer.OrdinalIgnoreCase);
+            return _specialDirectories.Contains(di.Name, StringComparer.OrdinalIgnoreCase);
         }
 
-        throw new PlatformNotSupportedException("Mount point detection is only supported on Linux.");
+        return _specialDirectories.Contains(di.Name, StringComparer.Ordinal);
     }
 }
