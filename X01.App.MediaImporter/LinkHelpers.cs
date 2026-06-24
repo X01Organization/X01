@@ -3,37 +3,17 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
-namespace X01.App.MediaImporter
+namespace X01.App.MediaImporter;
+
+internal static class LinkHelpers
 {
-    internal static class LinkHelpers
+    public static bool IsSymbolicLink(string path)
     {
-        public static bool IsLink(string path)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            return IsSymbolicLink(path) || IsHardLink(path);
+            return UnixLinkHelpers.IsSymbolicLink(path);
         }
 
-        public static bool IsSymbolicLink(string path)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                return WindowsLinkHelpers.IsSymbolicLink(path);
-            }
-            else
-            {
-                return UnixLinkHelpers.IsSymbolicLink(path);
-            }
-        }
-
-        public static bool IsHardLink(string path)
-        { 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                return WindowsLinkHelpers.IsHardLink(path);
-            }
-            else
-            {
-                return UnixLinkHelpers.IsHardLink(path);
-            }
-        }
+        throw new PlatformNotSupportedException("Symbolic link detection is only supported on Linux.");
     }
 }
